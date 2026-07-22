@@ -35,3 +35,6 @@ AuthKey_*
 *.tmp
 *.temp
 *.log
+
+# Generated site output
+dist/
