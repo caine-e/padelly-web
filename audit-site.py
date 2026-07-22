@@ -15,6 +15,7 @@ from urllib.parse import unquote, urljoin, urlparse
 ROOT = Path(__file__).resolve().parent
 ORIGIN = "https://getpadelly.com"
 ROBOTS_VALUE = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+LEGAL_ROBOTS_VALUE = "noindex, follow"
 DEDICATION = "♥ Built with love by AI and dedicated to Katja, who is way out of my league, on and off the court."
 
 GROUPS = [
@@ -23,7 +24,11 @@ GROUPS = [
     ("/support/", "/de/support/", "/es/support/"),
     ("/apple-watch-padel-scoring/", "/de/padel-zaehlen-mit-apple-watch/", "/es/marcador-de-padel-en-apple-watch/"),
     ("/padel-scoring-formats/", "/de/padel-zaehlweisen/", "/es/formatos-de-puntuacion-de-padel/"),
+    ("/imprint/", "/de/impressum/", "/es/aviso-legal/"),
 ]
+
+LEGAL_ROUTES = {"/imprint/", "/de/impressum/", "/es/aviso-legal/"}
+PRIVACY_ROUTES = {"/privacy/", "/de/privacy/", "/es/privacy/"}
 
 EXPECTED_HREFLANGS: dict[str, dict[str, str]] = {}
 for en, de, es in GROUPS:
@@ -160,7 +165,8 @@ def main() -> int:
             descriptions[route] = desc_values[0]
 
         robots_values = [m.get("content", "") for m in parser.metas if m.get("name") == "robots"]
-        if robots_values != [ROBOTS_VALUE]:
+        expected_robots = LEGAL_ROBOTS_VALUE if route in LEGAL_ROUTES else ROBOTS_VALUE
+        if robots_values != [expected_robots]:
             errors.append(f"{route}: incorrect robots meta")
 
         canonical_values = [l.get("href", "") for l in parser.links if l.get("rel") == "canonical"]
@@ -168,7 +174,8 @@ def main() -> int:
         if canonical_values != [expected_canonical]:
             errors.append(f"{route}: canonical is not self-referencing")
         else:
-            canonicals.add(expected_canonical)
+            if route not in LEGAL_ROUTES:
+                canonicals.add(expected_canonical)
 
         alternates = {
             link.get("hreflang", ""): link.get("href", "")
@@ -200,6 +207,18 @@ def main() -> int:
             errors.append(f"{route}: contains href=\"#\"")
         if re.search(r'<a[^>]+class=["\'][^"\']*store-badge', source):
             errors.append(f"{route}: store placeholder is an active link")
+        if "mailto:" in source or "support@getpadelly.com" in source:
+            errors.append(f"{route}: email address is not source-obfuscated")
+
+        legal_route = "/de/impressum/" if route.startswith("/de/") else "/es/aviso-legal/" if route.startswith("/es/") else "/imprint/"
+        legal_target = ORIGIN + legal_route
+        footer_legal_links = [
+            urljoin(ORIGIN + route, anchor.get("href", ""))
+            for anchor in parser.anchors
+            if anchor.get("href") and anchor.get("data-legal-link") == "true"
+        ]
+        if footer_legal_links != [legal_target]:
+            errors.append(f"{route}: footer legal link is missing or incorrect")
 
         preference_scripts = [s for s in parser.scripts if s.get("src", "").endswith("assets/preferences.js")]
         site_scripts = [s for s in parser.scripts if s.get("src", "").endswith("assets/site.js")]
@@ -287,7 +306,8 @@ def main() -> int:
             errors.append("Sitemap URLs do not exactly match page canonicals")
         for canonical, element in sitemap_urls.items():
             route = urlparse(canonical).path
-            if element.findtext("s:lastmod", default="", namespaces=ns) != "2026-07-18":
+            expected_lastmod = "2026-07-22" if route in PRIVACY_ROUTES else "2026-07-18"
+            if element.findtext("s:lastmod", default="", namespaces=ns) != expected_lastmod:
                 errors.append(f"{route}: incorrect sitemap lastmod")
             alternates = {link.get("hreflang", ""): link.get("href", "") for link in element.findall("x:link", ns)}
             if alternates != EXPECTED_HREFLANGS.get(route):
@@ -317,7 +337,8 @@ def main() -> int:
     print("- required search/social metadata")
     print("- valid JSON-LD with visible support FAQs")
     print("- internal links, language pickers, scripts, images, sitemap, and robots")
-    print("- exact dedication on every page; no href=\"#\", active store placeholder, noindex, or CNAME")
+    print("- exact dedication, legal links, source-obfuscated email, indexed sitemap, and legal noindex policy")
+    print("- no href=\"#\", active store placeholder, or CNAME")
     return 0
 
 

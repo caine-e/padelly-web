@@ -14,6 +14,7 @@ cp -R \
   assets \
   apple-watch-padel-scoring \
   padel-scoring-formats \
+  imprint \
   privacy \
   support \
   de \

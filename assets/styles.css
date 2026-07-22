@@ -1230,7 +1230,8 @@ a.store-badge:hover {
 }
 
 .prose a,
-.support-card a {
+.support-card a,
+.email-address {
   color: var(--accent-ink);
   font-weight: 660;
   text-underline-offset: 3px;
@@ -1552,7 +1553,8 @@ a.store-badge:hover {
   font-size: 14px;
 }
 
-.support-card a {
+.support-card a,
+.support-card .email-address {
   font-size: 21px;
 }
 
@@ -2059,7 +2061,8 @@ a.store-badge:hover {
     padding: 25px;
   }
 
-  .support-card a {
+  .support-card a,
+  .support-card .email-address {
     font-size: 17px;
   }
 
