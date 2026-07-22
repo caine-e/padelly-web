@@ -29,6 +29,10 @@ GROUPS = [
 
 LEGAL_ROUTES = {"/imprint/", "/de/impressum/", "/es/aviso-legal/"}
 PRIVACY_ROUTES = {"/privacy/", "/de/privacy/", "/es/privacy/"}
+SUPPORT_ROUTES = {"/support/", "/de/support/", "/es/support/"}
+TURNSTILE_SITE_KEY = "0x4AAAAAAD7gbCEDTdTNu6rM"
+TURNSTILE_ACTION = "turnstile-spin-v2"
+TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js"
 
 EXPECTED_HREFLANGS: dict[str, dict[str, str]] = {}
 for en, de, es in GROUPS:
@@ -58,6 +62,11 @@ class PageParser(HTMLParser):
         self.anchors: list[dict[str, str]] = []
         self.images: list[dict[str, str]] = []
         self.scripts: list[dict[str, str]] = []
+        self.forms: list[dict[str, str]] = []
+        self.inputs: list[dict[str, str]] = []
+        self.selects: list[dict[str, str]] = []
+        self.textareas: list[dict[str, str]] = []
+        self.divs: list[dict[str, str]] = []
         self.json_blocks: list[str] = []
         self._json_parts: list[str] | None = None
         self._hidden_depth = 0
@@ -82,6 +91,16 @@ class PageParser(HTMLParser):
             self.scripts.append(values)
             if values.get("type") == "application/ld+json":
                 self._json_parts = []
+        elif tag == "form":
+            self.forms.append(values)
+        elif tag == "input":
+            self.inputs.append(values)
+        elif tag == "select":
+            self.selects.append(values)
+        elif tag == "textarea":
+            self.textareas.append(values)
+        elif tag == "div":
+            self.divs.append(values)
 
         if tag in {"script", "style", "template"}:
             self._hidden_depth += 1
@@ -210,6 +229,13 @@ def main() -> int:
         if "mailto:" in source or "support@getpadelly.com" in source:
             errors.append(f"{route}: email address is not source-obfuscated")
 
+        email_displays = source.count('class="email-address"')
+        if route in LEGAL_ROUTES | PRIVACY_ROUTES:
+            if email_displays < 1:
+                errors.append(f"{route}: required legal email display is missing")
+        elif email_displays:
+            errors.append(f"{route}: email display is outside a legal or privacy page")
+
         legal_route = "/de/impressum/" if route.startswith("/de/") else "/es/aviso-legal/" if route.startswith("/es/") else "/imprint/"
         legal_target = ORIGIN + legal_route
         footer_legal_links = [
@@ -226,6 +252,62 @@ def main() -> int:
             errors.append(f"{route}: minimal preference script must be synchronous")
         if len(site_scripts) != 1 or "defer" not in site_scripts[0]:
             errors.append(f"{route}: interaction script must use defer")
+
+        turnstile_scripts = [s for s in parser.scripts if s.get("src") == TURNSTILE_SCRIPT]
+        if route in SUPPORT_ROUTES:
+            support_forms = [
+                form for form in parser.forms
+                if form.get("action") == "/api/support"
+                and form.get("method", "").lower() == "post"
+                and "data-support-form" in form
+            ]
+            if len(support_forms) != 1:
+                errors.append(f"{route}: expected one secure support form")
+
+            inputs = {item.get("name", ""): item for item in parser.inputs if item.get("name")}
+            if not {"name", "email", "locale", "company"}.issubset(inputs):
+                errors.append(f"{route}: support form inputs are incomplete")
+            else:
+                expected_locale = "de" if route.startswith("/de/") else "es" if route.startswith("/es/") else "en"
+                if inputs["locale"].get("type") != "hidden" or inputs["locale"].get("value") != expected_locale:
+                    errors.append(f"{route}: hidden locale is incorrect")
+                if inputs["name"].get("maxlength") != "80":
+                    errors.append(f"{route}: name limit is incorrect")
+                if inputs["email"].get("type") != "email" or "required" not in inputs["email"]:
+                    errors.append(f"{route}: reply email is not required")
+                if "form-honeypot" not in source or inputs["company"].get("tabindex") != "-1":
+                    errors.append(f"{route}: honeypot is missing or exposed")
+
+            topics = [item for item in parser.selects if item.get("name") == "topic" and "required" in item]
+            messages = [
+                item for item in parser.textareas
+                if item.get("name") == "message"
+                and item.get("minlength") == "10"
+                and item.get("maxlength") == "5000"
+                and "required" in item
+            ]
+            if len(topics) != 1 or len(messages) != 1:
+                errors.append(f"{route}: topic or message validation is incomplete")
+
+            widgets = [
+                item for item in parser.divs
+                if "cf-turnstile" in item.get("class", "").split()
+                and item.get("data-sitekey") == TURNSTILE_SITE_KEY
+                and item.get("data-action") == TURNSTILE_ACTION
+            ]
+            if len(widgets) != 1 or len(turnstile_scripts) != 1:
+                errors.append(f"{route}: Turnstile widget or script is incorrect")
+
+            privacy_route = "/de/privacy/" if route.startswith("/de/") else "/es/privacy/" if route.startswith("/es/") else "/privacy/"
+            privacy_links = [
+                urljoin(ORIGIN + route, anchor.get("href", ""))
+                for anchor in parser.anchors
+                if anchor.get("href") and urljoin(ORIGIN + route, anchor.get("href", "")) == ORIGIN + privacy_route
+            ]
+            if len(privacy_links) < 1:
+                errors.append(f"{route}: localized privacy link is missing from the form")
+        elif parser.forms or turnstile_scripts:
+            errors.append(f"{route}: support form resources appear outside support")
 
         json_values = []
         for index, block in enumerate(parser.json_blocks, start=1):
@@ -306,7 +388,7 @@ def main() -> int:
             errors.append("Sitemap URLs do not exactly match page canonicals")
         for canonical, element in sitemap_urls.items():
             route = urlparse(canonical).path
-            expected_lastmod = "2026-07-22" if route in PRIVACY_ROUTES else "2026-07-18"
+            expected_lastmod = "2026-07-22" if route in PRIVACY_ROUTES | SUPPORT_ROUTES else "2026-07-18"
             if element.findtext("s:lastmod", default="", namespaces=ns) != expected_lastmod:
                 errors.append(f"{route}: incorrect sitemap lastmod")
             alternates = {link.get("hreflang", ""): link.get("href", "") for link in element.findall("x:link", ns)}
@@ -325,6 +407,17 @@ def main() -> int:
     if not (ROOT / "assets/social/padelly-social-1200x630.jpg").is_file():
         errors.append("Social preview image is missing")
 
+    source_files = [
+        path for path in ROOT.rglob("*")
+        if path.is_file()
+        and path.suffix in {".html", ".js", ".css"}
+        and not any(part in {".git", "dist", "node_modules"} for part in path.parts)
+    ]
+    for path in source_files:
+        source = path.read_text(encoding="utf-8")
+        if "mailto:" in source or "support@getpadelly.com" in source:
+            errors.append(f"{path.relative_to(ROOT)}: contains a clickable or contiguous public email")
+
     if errors:
         print(f"FAIL: {len(errors)} issue(s)")
         for error in errors:
@@ -337,7 +430,8 @@ def main() -> int:
     print("- required search/social metadata")
     print("- valid JSON-LD with visible support FAQs")
     print("- internal links, language pickers, scripts, images, sitemap, and robots")
-    print("- exact dedication, legal links, source-obfuscated email, indexed sitemap, and legal noindex policy")
+    print("- localized support forms, honeypots, Turnstile markers, and privacy links")
+    print("- exact dedication, legal links, legal-only email display, indexed sitemap, and legal noindex policy")
     print("- no href=\"#\", active store placeholder, or CNAME")
     return 0
 

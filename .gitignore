@@ -38,3 +38,9 @@ AuthKey_*
 
 # Generated site output
 dist/
+
+# Cloudflare local development
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/

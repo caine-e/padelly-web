@@ -211,5 +211,87 @@
         closeMenu(openPicker, true);
       }
     });
+
+    const supportForm = document.querySelector("[data-support-form]");
+    if (supportForm && typeof window.fetch === "function") {
+      const submitButton = supportForm.querySelector('button[type="submit"]');
+      const submitLabel = supportForm.querySelector("[data-submit-label]");
+      const sendingLabel = supportForm.querySelector("[data-sending-label]");
+      const status = supportForm.querySelector("[data-form-status]");
+
+      function setSubmitting(isSubmitting) {
+        submitButton.disabled = isSubmitting;
+        submitLabel.hidden = isSubmitting;
+        sendingLabel.hidden = !isSubmitting;
+        supportForm.setAttribute("aria-busy", isSubmitting ? "true" : "false");
+      }
+
+      function showStatus(message, state) {
+        status.textContent = message;
+        status.dataset.state = state;
+      }
+
+      function resetTurnstile() {
+        if (window.turnstile && typeof window.turnstile.reset === "function") {
+          window.turnstile.reset();
+        }
+      }
+
+      supportForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if (!supportForm.checkValidity()) {
+          supportForm.reportValidity();
+          showStatus(supportForm.dataset.invalidMessage, "error");
+          return;
+        }
+
+        setSubmitting(true);
+        showStatus("", "");
+
+        try {
+          const formData = new FormData(supportForm);
+          const body = new URLSearchParams();
+          formData.forEach(function (value, key) {
+            if (typeof value === "string") body.append(key, value);
+          });
+
+          const response = await window.fetch(supportForm.action, {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            },
+            body: body.toString(),
+            credentials: "same-origin",
+          });
+
+          let result = null;
+          try {
+            result = await response.json();
+          } catch (_error) {
+            result = null;
+          }
+
+          if (response.ok && result && result.ok === true) {
+            supportForm.reset();
+            showStatus(supportForm.dataset.successMessage, "success");
+            resetTurnstile();
+          } else {
+            const message = result && result.code === "invalid_request"
+              ? supportForm.dataset.invalidMessage
+              : result && result.code === "verification_failed"
+                ? supportForm.dataset.verificationMessage
+                : supportForm.dataset.serverMessage;
+            showStatus(message, "error");
+            resetTurnstile();
+          }
+        } catch (_error) {
+          showStatus(supportForm.dataset.serverMessage, "error");
+          resetTurnstile();
+        } finally {
+          setSubmitting(false);
+        }
+      });
+    }
   });
 })();

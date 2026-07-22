@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://getpadelly.com/support/"><link rel="alternate" hreflang="en" href="https://getpadelly.com/support/"><link rel="alternate" hreflang="de" href="https://getpadelly.com/de/support/"><link rel="alternate" hreflang="es" href="https://getpadelly.com/es/support/"><link rel="alternate" hreflang="x-default" href="https://getpadelly.com/support/">
   <meta property="og:type" content="website"><meta property="og:site_name" content="Padelly"><meta property="og:title" content="Padelly Support — iPhone &amp; Apple Watch Help"><meta property="og:description" content="Concise help for scoring, formats, Fitness, privacy, iCloud backup, and release availability."><meta property="og:url" content="https://getpadelly.com/support/"><meta property="og:locale" content="en_GB"><meta property="og:locale:alternate" content="de_DE"><meta property="og:locale:alternate" content="es_ES"><meta property="og:image" content="https://getpadelly.com/assets/social/padelly-social-1200x630.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Padelly app icon and iPhone match setup preview">
   <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Padelly Support — iPhone &amp; Apple Watch Help"><meta name="twitter:description" content="Concise help for scoring, formats, Fitness, privacy, iCloud backup, and release availability."><meta name="twitter:image" content="https://getpadelly.com/assets/social/padelly-social-1200x630.jpg"><meta name="twitter:image:alt" content="Padelly app icon and iPhone match setup preview">
-  <link rel="icon" href="../assets/icons/favicon-64.png" type="image/png"><link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png"><script src="../assets/preferences.js"></script><link rel="stylesheet" href="../assets/styles.css"><script src="../assets/site.js" defer></script>
+  <link rel="icon" href="../assets/icons/favicon-64.png" type="image/png"><link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png"><script src="../assets/preferences.js"></script><link rel="stylesheet" href="../assets/styles.css"><script src="../assets/site.js" defer></script><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -48,8 +48,27 @@
   </div></header>
   <main class="content-shell" id="main">
     <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="../">Home</a></li><li aria-current="page">Support</li></ol></nav>
-    <header class="content-header"><h1>Need help with Padelly?</h1><p>Start with the concise answers below, or email us if something on court still does not make sense.</p></header>
-    <div class="support-card"><p>Contact Padelly Support</p><span class="email-address" aria-label="support at getpadelly dot com"><span aria-hidden="true">support</span><span aria-hidden="true">&#64;</span><span aria-hidden="true">getpadelly.com</span></span></div>
+    <header class="content-header"><h1>Need help with Padelly?</h1><p>Start with the concise answers below, or use the secure form if something on court still does not make sense.</p></header>
+    <section class="support-card" aria-labelledby="support-form-heading">
+      <h2 id="support-form-heading">Contact Padelly Support</h2>
+      <p class="support-intro">Tell us what happened and where we can reply. The form is protected against automated spam.</p>
+      <form action="/api/support" method="post" data-support-form data-success-message="Thanks. Your request was sent to Padelly Support." data-invalid-message="Please check the highlighted fields and try again." data-verification-message="The spam check could not be completed. Please try again." data-server-message="The request could not be sent right now. Please try again later.">
+        <input type="hidden" name="locale" value="en">
+        <div class="support-form-grid">
+          <div class="form-field"><label for="support-name">Name <span>(optional)</span></label><input id="support-name" name="name" type="text" maxlength="80" autocomplete="name"></div>
+          <div class="form-field"><label for="support-email">Reply email</label><input id="support-email" name="email" type="email" maxlength="254" autocomplete="email" required></div>
+          <div class="form-field form-field-wide"><label for="support-topic">Topic</label><select id="support-topic" name="topic" required><option value="">Choose a topic</option><option value="app_issue">App issue</option><option value="privacy">Privacy question</option><option value="feedback">Feedback</option><option value="other">Other</option></select></div>
+          <div class="form-field form-field-wide"><label for="support-message">Message</label><textarea id="support-message" name="message" rows="7" minlength="10" maxlength="5000" required></textarea><small>10 to 5,000 characters. Do not include health or other sensitive data.</small></div>
+        </div>
+        <div class="form-honeypot" aria-hidden="true"><label for="support-company">Company</label><input id="support-company" name="company" type="text" maxlength="200" autocomplete="off" tabindex="-1"></div>
+        <div class="turnstile-wrap"><div class="cf-turnstile" data-sitekey="0x4AAAAAAD7gbCEDTdTNu6rM" data-action="turnstile-spin-v2" data-theme="auto"></div></div>
+        <p class="form-privacy">By sending this form, you agree that we may use your details to answer your request. See the <a href="../privacy/">Privacy Policy</a>.</p>
+        <button class="support-submit" type="submit"><span data-submit-label>Send request</span><span data-sending-label hidden>Sending…</span></button>
+        <p class="form-status" role="status" aria-live="polite" data-form-status></p>
+      </form>
+      <p class="support-fallback-status success" id="support-sent" role="status">Thanks. Your request was sent to Padelly Support.</p>
+      <p class="support-fallback-status error" id="support-error" role="alert">The request could not be sent. Please check the form and try again.</p>
+    </section>
     <section aria-labelledby="faq-heading"><h2 class="faq-title" id="faq-heading">Frequently asked questions</h2><div class="faq-list">
       <details><summary>How does scoring on Apple Watch work?</summary><p>Set up a match on iPhone, choose the first serving team, then tap the large team controls on Apple Watch for each point. Padelly keeps the games, sets, serving information, and selected rules. Read the <a href="../apple-watch-padel-scoring/">Apple Watch scoring guide</a>.</p></details>
       <details><summary>Can I undo the wrong point?</summary><p>Yes. Undo restores the score and serving state, including across game, set, and tie-break boundaries. The history is intentionally bounded to recent scoring actions.</p></details>
