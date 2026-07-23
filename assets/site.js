@@ -46,11 +46,35 @@
     }
   }
 
+  function updateScreenshots() {
+    const locale = ["en", "de", "es"].includes(root.lang) ? root.lang : "en";
+    const appearance = effectiveAppearance();
+
+    document.querySelectorAll("[data-screenshot-scene][data-screenshot-platform]").forEach(function (image) {
+      const scene = image.dataset.screenshotScene;
+      const platform = image.dataset.screenshotPlatform;
+      const widths = (image.dataset.screenshotWidths || "")
+        .split(",")
+        .map(function (value) { return value.trim(); })
+        .filter(Boolean);
+
+      if (!scene || !platform || !widths.length) return;
+
+      const base = "/assets/screenshots/" + platform + "/" + scene + "-" + locale + "-" + appearance;
+      image.src = base + "-" + widths[0] + ".webp";
+      image.srcset = widths.map(function (width) {
+        return base + "-" + width + ".webp " + width + "w";
+      }).join(", ");
+    });
+  }
+
   updateThemeColor();
+  updateScreenshots();
 
   function onSystemAppearanceChange() {
     if (currentAppearance === "system") {
       updateThemeColor();
+      updateScreenshots();
     }
   }
 
@@ -184,6 +208,7 @@
             root.dataset.appearance = currentAppearance;
             savePreference(appearanceKey, currentAppearance);
             updateThemeColor();
+            updateScreenshots();
             syncPicker(picker, currentAppearance);
             closeMenu(picker, true);
           } else if (type === "preset") {

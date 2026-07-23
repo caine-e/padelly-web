@@ -30,6 +30,20 @@ GROUPS = [
 LEGAL_ROUTES = {"/imprint/", "/de/impressum/", "/es/aviso-legal/"}
 PRIVACY_ROUTES = {"/privacy/", "/de/privacy/", "/es/privacy/"}
 SUPPORT_ROUTES = {"/support/", "/de/support/", "/es/support/"}
+HOME_SCREENSHOT_ROUTES = {"/", "/de/", "/es/"}
+WATCH_SCREENSHOT_ROUTES = {
+    "/apple-watch-padel-scoring/",
+    "/de/padel-zaehlen-mit-apple-watch/",
+    "/es/marcador-de-padel-en-apple-watch/",
+}
+HOME_SCREENSHOT_SCENES = [
+    ("ios", "home", ["640", "960"]),
+    ("ios", "history", ["640", "960"]),
+    ("ios", "fitness-icloud", ["640", "960"]),
+    ("ios", "appearance-colors", ["640", "960"]),
+    ("ios", "alternate-icons", ["640", "960"]),
+]
+WATCH_SCREENSHOT_SCENES = [("watchos", "live-score", ["416"])]
 TURNSTILE_SITE_KEY = "0x4AAAAAAD7gbCEDTdTNu6rM"
 TURNSTILE_ACTION = "turnstile-spin-v2"
 TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js"
@@ -228,6 +242,34 @@ def main() -> int:
             errors.append(f"{route}: store placeholder is an active link")
         if "mailto:" in source or "support@getpadelly.com" in source:
             errors.append(f"{route}: email address is not source-obfuscated")
+
+        expected_screenshots = (
+            HOME_SCREENSHOT_SCENES if route in HOME_SCREENSHOT_ROUTES
+            else WATCH_SCREENSHOT_SCENES if route in WATCH_SCREENSHOT_ROUTES
+            else []
+        )
+        managed_screenshots = [
+            image for image in parser.images
+            if image.get("data-screenshot-scene") or image.get("data-screenshot-platform")
+        ]
+        actual_screenshots = [
+            (
+                image.get("data-screenshot-platform", ""),
+                image.get("data-screenshot-scene", ""),
+                image.get("data-screenshot-widths", "").split(","),
+            )
+            for image in managed_screenshots
+        ]
+        if actual_screenshots != expected_screenshots:
+            errors.append(f"{route}: managed screenshot contract mismatch: {actual_screenshots}")
+
+        locale = "de" if route.startswith("/de/") else "es" if route.startswith("/es/") else "en"
+        for platform, scene, widths in expected_screenshots:
+            for appearance in ("light", "dark"):
+                for width in widths:
+                    asset = ROOT / "assets" / "screenshots" / platform / f"{scene}-{locale}-{appearance}-{width}.webp"
+                    if not asset.is_file() or asset.stat().st_size == 0:
+                        errors.append(f"{route}: missing screenshot asset {asset.relative_to(ROOT)}")
 
         email_displays = source.count('class="email-address"')
         if route in LEGAL_ROUTES | PRIVACY_ROUTES:

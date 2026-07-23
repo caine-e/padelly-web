@@ -664,7 +664,8 @@ a.store-badge:hover {
 }
 
 .screenshot-frame,
-.screen-frame {
+.screen-frame,
+.watch-screen-frame {
   border: 1px solid var(--line-strong);
   background: var(--glass-solid);
   background: var(--glass);
@@ -877,6 +878,29 @@ a.store-badge:hover {
   height: auto;
   display: block;
   border-radius: 34px;
+}
+
+.watch-screen-frame {
+  position: relative;
+  padding: 10px;
+  border-radius: 92px;
+}
+
+.watch-screen-frame::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 10% -18%;
+  border-radius: 50%;
+  background: rgba(var(--accent-rgb), 0.16);
+  filter: blur(30px);
+}
+
+.watch-screen-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 82px;
 }
 
 .feature-list {
@@ -2252,6 +2276,7 @@ a.store-badge:hover {
   .store-panel,
   .screenshot-frame,
   .screen-frame,
+  .watch-screen-frame,
   .feature-card,
   .customization-panel,
   .content-header,

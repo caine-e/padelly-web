@@ -39,6 +39,9 @@ AuthKey_*
 # Generated site output
 dist/
 
+# Local screenshot review output
+qa-artifacts/
+
 # Cloudflare local development
 .dev.vars
 .dev.vars.*

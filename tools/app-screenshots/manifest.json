@@ -1,0 +1,96 @@
+{
+  "source": {
+    "repository": "https://github.com/caine-e/padelly.git",
+    "ref": "origin/main",
+    "commit": "84a4a5486e914980dddc6a97381c2a84f6085f1b"
+  },
+  "locales": {
+    "en": {
+      "apple": "en_GB",
+      "android": "en-GB"
+    },
+    "de": {
+      "apple": "de_DE",
+      "android": "de-DE"
+    },
+    "es": {
+      "apple": "es_ES",
+      "android": "es-ES"
+    }
+  },
+  "appearances": [
+    "light",
+    "dark"
+  ],
+  "platforms": {
+    "ios": {
+      "device": "iPhone 17 Pro",
+      "runtime": "iOS 26.5",
+      "bundleId": "com.caine.Padelly",
+      "scheme": "Padelly",
+      "project": "ios/Padelly/Padelly.xcodeproj",
+      "published": true,
+      "scenes": [
+        "home",
+        "match-setup",
+        "live-score",
+        "history",
+        "fitness-icloud",
+        "appearance-colors",
+        "alternate-icons"
+      ],
+      "widths": [
+        640,
+        960
+      ]
+    },
+    "watchos": {
+      "device": "Apple Watch Series 11 (46mm)",
+      "runtime": "watchOS 26.5",
+      "bundleId": "com.caine.Padelly.watchkitapp",
+      "scheme": "Padelly Watch App Watch App",
+      "project": "ios/Padelly/Padelly.xcodeproj",
+      "published": true,
+      "scenes": [
+        "quick-start",
+        "live-score"
+      ],
+      "widths": [
+        416
+      ]
+    },
+    "android": {
+      "device": "pixel_9",
+      "api": 37,
+      "bundleId": "com.caine.padelly",
+      "module": "app",
+      "published": false,
+      "scenes": [
+        "match-setup",
+        "live-score",
+        "history",
+        "player-team-settings"
+      ]
+    },
+    "wearos": {
+      "device": "wearos_large_round",
+      "api": 36,
+      "bundleId": "com.caine.padelly",
+      "module": "wear",
+      "published": false,
+      "scenes": [
+        "quick-start",
+        "live-score"
+      ]
+    }
+  },
+  "syntheticData": {
+    "currentPlayer": "Alex",
+    "players": [
+      "Alex",
+      "Sam",
+      "Jordan",
+      "Taylor"
+    ]
+  }
+}
