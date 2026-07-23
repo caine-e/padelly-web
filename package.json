@@ -1,0 +1,13 @@
+{
+  "name": "padelly-web",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "build": "./build.sh",
+    "audit": "python3 audit-site.py",
+    "test": "node --test"
+  }
+}

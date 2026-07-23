@@ -1,0 +1,4 @@
+TURNSTILE_SECRET=replace-with-a-turnstile-test-secret
+CLOUDFLARE_EMAIL_API_TOKEN=replace-with-a-scoped-api-token
+CLOUDFLARE_ACCOUNT_ID=replace-with-your-account-id
+SUPPORT_RECIPIENT=replace-with-a-verified-destination
