@@ -1827,7 +1827,11 @@ a.store-badge:hover {
     padding: 2px 4px 4px;
     overflow-x: auto;
     gap: 18px;
+    scroll-padding-inline: 4px;
+    scroll-snap-type: x proximity;
     scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 26px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 26px), transparent 100%);
   }
 
   .header-nav::-webkit-scrollbar {
@@ -1836,6 +1840,7 @@ a.store-badge:hover {
 
   .header-nav a {
     flex: none;
+    scroll-snap-align: start;
   }
 
   .global-controls {
