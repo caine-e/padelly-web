@@ -4,6 +4,7 @@
   const root = document.documentElement;
   const appearanceKey = "padelly-appearance";
   const presetKey = "padelly-color-preset";
+  const languageKey = "padelly-language";
   const appearances = ["system", "light", "dark"];
   const presets = ["neon", "court", "ultra"];
 
@@ -68,21 +69,46 @@
     });
   }
 
+  function updateVisibleAppIcons() {
+    const locale = ["en", "de", "es"].includes(root.lang) ? root.lang : "en";
+    const isDark = effectiveAppearance() === "dark";
+    const iconName = isDark ? "midnight-black" : "classic-white";
+    const iconLabel = {
+      en: isDark ? "Padelly Midnight Black app icon" : "Padelly Classic White app icon",
+      de: isDark ? "Padelly App-Symbol Midnight Black" : "Padelly App-Symbol Classic White",
+      es: isDark ? "Icono Midnight Black de Padelly" : "Icono Classic White de Padelly",
+    }[locale];
+
+    document.querySelectorAll(".brand-icon").forEach(function (image) {
+      image.src = "/assets/icons/" + iconName + "-96.webp";
+    });
+
+    document.querySelectorAll(".hero-app-icon").forEach(function (image) {
+      image.src = "/assets/icons/" + iconName + "-512.webp";
+      image.alt = iconLabel;
+    });
+  }
+
   updateThemeColor();
   updateScreenshots();
+  updateVisibleAppIcons();
 
   // Keep device choice in one place. The query override makes both hero states
   // easy to inspect without relying on a particular browser or device.
   function resolveHeroDeviceMode() {
-    const requested = new URLSearchParams(window.location.search).get("device");
+    const requested = (new URLSearchParams(window.location.search).get("device") || "").toLowerCase();
     if (requested === "ios" || requested === "android") return requested;
 
     const userAgent = navigator.userAgent || "";
-    const isWebKit = /AppleWebKit/i.test(userAgent);
-    const isPhoneOrTablet = /iPhone|iPad|iPod/i.test(userAgent);
-    const isDesktopModeIPad = /Macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1;
+    const platform = navigator.platform || "";
+    const hintedPlatform = navigator.userAgentData && navigator.userAgentData.platform
+      ? navigator.userAgentData.platform
+      : "";
+    const isApplePlatform = /^(Mac|iPhone|iPad|iPod|AppleTV|iOS|macOS|iPadOS)/i.test(platform)
+      || /^(iOS|macOS|iPadOS|AppleTV|visionOS)$/i.test(hintedPlatform)
+      || /Macintosh|Mac OS X|iPhone|iPad|iPod|AppleTV|VisionOS/i.test(userAgent);
 
-    return isWebKit && (isPhoneOrTablet || isDesktopModeIPad) ? "ios" : "android";
+    return isApplePlatform ? "ios" : "android";
   }
 
   const heroDeviceMode = resolveHeroDeviceMode();
@@ -93,9 +119,8 @@
       en: {
         iosLabel: "iPhone experience",
         androidLabel: "Android preview",
-        androidAria: "Representative Android app preview. Android availability is coming soon.",
+        androidAria: "Representative Android app preview.",
         androidEyebrow: "Android app preview",
-        androidAvailability: "Google Play availability coming soon",
         quickStart: "Quick Start",
         matchType: "Doubles",
         matchFormat: "Fast Match",
@@ -105,9 +130,8 @@
       de: {
         iosLabel: "iPhone-Erlebnis",
         androidLabel: "Android-Vorschau",
-        androidAria: "Repräsentative Android-App-Vorschau. Android ist bald verfügbar.",
+        androidAria: "Repräsentative Android-App-Vorschau.",
         androidEyebrow: "Android-App-Vorschau",
-        androidAvailability: "Google Play ist bald verfügbar",
         quickStart: "Schnellstart",
         matchType: "Doppel",
         matchFormat: "Schnelles Match",
@@ -117,9 +141,8 @@
       es: {
         iosLabel: "Experiencia en iPhone",
         androidLabel: "Vista previa de Android",
-        androidAria: "Vista previa representativa de la app Android. Android estará disponible próximamente.",
+        androidAria: "Vista previa representativa de la app Android.",
         androidEyebrow: "Vista previa de la app Android",
-        androidAvailability: "Google Play estará disponible próximamente",
         quickStart: "Inicio rápido",
         matchType: "Dobles",
         matchFormat: "Partido rápido",
@@ -192,11 +215,14 @@
     caption.className = "hero-device-caption";
     caption.textContent = heroDeviceMode === "ios" ? copy.iosLabel : copy.androidLabel;
 
-    if (heroDeviceMode === "android" && hero) {
-      const eyebrow = hero.querySelector(".eyebrow");
+    if (hero) {
       const availability = hero.querySelector(".availability");
-      if (eyebrow) eyebrow.textContent = copy.androidEyebrow;
-      if (availability) availability.textContent = copy.androidAvailability;
+      if (availability) availability.hidden = heroDeviceMode === "android";
+
+      if (heroDeviceMode === "android") {
+        const eyebrow = hero.querySelector(".eyebrow");
+        if (eyebrow) eyebrow.textContent = copy.androidEyebrow;
+      }
     }
 
     fallbackFrame.remove();
@@ -266,12 +292,9 @@
   function homepageCopy(locale) {
     const copy = {
       en: {
-        tryPadelly: "Try Padelly",
-        heroActionSubline: "Interactive preview",
-        previewLabel: "Interactive preview",
+        previewLabel: "Inside Padelly",
         tourTitle: "From first point to match point.",
-        tourCopy: "A short, guided look at the real Padelly flow. The screenshots are from the app. The controls are a deterministic product preview, not a live account or online match.",
-        tourOpen: "Open the full preview",
+        tourCopy: "Six real Padelly screens, in the same calm rhythm as a match takes shape.",
         steps: [
           { label: "Quick Start", scene: "home", title: "Begin with the match you know.", copy: "Pick up a recent setup or start fresh from the Play screen.", alt: "Padelly home screen with Quick Start on iPhone" },
           { label: "Set up", scene: "match-setup", title: "Choose the shape of the match.", copy: "Select singles or doubles, the format, and who serves first before the first ball.", alt: "Padelly match setup screen on iPhone" },
@@ -280,25 +303,6 @@
           { label: "History", scene: "history", title: "Let the result stay useful.", copy: "Finished matches stay local with scores, duration, player records, and useful history.", alt: "Padelly match history screen on iPhone" },
           { label: "Appearance", scene: "appearance-colors", title: "Make the court yours.", copy: "Choose appearance and team colours without getting in the way of the match.", alt: "Padelly appearance and team colours screen on iPhone" },
         ],
-        prototypeTitle: "Try Padelly",
-        prototypeLead: "A short interactive preview using real app screenshots.",
-        close: "Close preview",
-        reset: "Reset demo",
-        back: "Back",
-        next: "Continue",
-        representative: "Representative preview",
-        summaryTitle: "Match completed",
-        summaryCopy: "A representative result screen based on the current Padelly match-completion flow.",
-        summaryResult: "Alex & Sam won",
-        summaryScore: "6–4, 6–3",
-        summaryDuration: "56 min",
-        liveControls: "Demo controls",
-        scoreThem: "Them +1",
-        scoreYou: "You +1",
-        undo: "Undo",
-        serving: "Switch serving",
-        demoState: "Demo state",
-        servingLabel: "Serving",
         formatLabel: "Choose your match mode",
         formatTitle: "Five real formats. One clear decision.",
         formatCopy: "Tap a format to see its real launch rules. The full, crawlable comparison remains available for every format.",
@@ -314,16 +318,11 @@
         deviceTitle: "Set up on iPhone. Keep score from the wrist.",
         phoneTitle: "iPhone", phoneCopy: "Choose players, format, and first serving team, or score on the phone when no Watch is available.",
         watchTitle: "Apple Watch", watchCopy: "Use the large on-court controls to record the next point while serving information stays visible.",
-        downloadTitle: "See Padelly in action", downloadSubline: "Store listings are coming soon", mobileDownload: "Try the preview",
-        previewQuery: "preview",
       },
       de: {
-        tryPadelly: "Padelly ausprobieren",
-        heroActionSubline: "Interaktive Vorschau",
-        previewLabel: "Interaktive Vorschau",
+        previewLabel: "In Padelly",
         tourTitle: "Vom ersten Punkt zum Matchball.",
-        tourCopy: "Ein kurzer, geführter Blick auf den echten Padelly-Ablauf. Die Screenshots stammen aus der App. Die Bedienelemente sind eine deterministische Produktvorschau, kein Konto und kein Online-Match.",
-        tourOpen: "Vollständige Vorschau öffnen",
+        tourCopy: "Sechs echte Padelly-Screens, im ruhigen Rhythmus eines Matches.",
         steps: [
           { label: "Schnellstart", scene: "home", title: "Mit dem vertrauten Match beginnen.", copy: "Eine letzte Konfiguration fortsetzen oder im Play-Bereich neu starten.", alt: "Padelly-Startbildschirm mit Schnellstart auf dem iPhone" },
           { label: "Einrichten", scene: "match-setup", title: "Die Form des Matches wählen.", copy: "Einzel oder Doppel, Format und erstes Aufschlagteam vor dem ersten Ball festlegen.", alt: "Padelly-Match-Einrichtung auf dem iPhone" },
@@ -332,25 +331,6 @@
           { label: "Verlauf", scene: "history", title: "Das Ergebnis sinnvoll behalten.", copy: "Abgeschlossene Matches bleiben lokal mit Punkten, Dauer, Spielerprofilen und Verlauf.", alt: "Padelly-Matchverlauf auf dem iPhone" },
           { label: "Darstellung", scene: "appearance-colors", title: "Den Court zu deinem machen.", copy: "Darstellung und Teamfarben wählen, ohne das Match zu überladen.", alt: "Padelly-Darstellung und Teamfarben auf dem iPhone" },
         ],
-        prototypeTitle: "Padelly ausprobieren",
-        prototypeLead: "Eine kurze interaktive Vorschau mit echten App-Screenshots.",
-        close: "Vorschau schließen",
-        reset: "Demo zurücksetzen",
-        back: "Zurück",
-        next: "Weiter",
-        representative: "Repräsentative Vorschau",
-        summaryTitle: "Match abgeschlossen",
-        summaryCopy: "Ein repräsentativer Ergebnisbildschirm auf Basis des aktuellen Padelly-Abschlussablaufs.",
-        summaryResult: "Alex & Sam gewinnen",
-        summaryScore: "6–4, 6–3",
-        summaryDuration: "56 Min.",
-        liveControls: "Demo-Steuerung",
-        scoreThem: "Sie +1",
-        scoreYou: "Ihr +1",
-        undo: "Undo",
-        serving: "Aufschlag wechseln",
-        demoState: "Demo-Status",
-        servingLabel: "Aufschlag",
         formatLabel: "Matchmodus wählen",
         formatTitle: "Fünf echte Formate. Eine klare Entscheidung.",
         formatCopy: "Ein Format antippen, um die echten Startregeln zu sehen. Der vollständige, crawlbare Vergleich bleibt für jedes Format verfügbar.",
@@ -366,16 +346,11 @@
         deviceTitle: "Auf dem iPhone einrichten. Am Handgelenk zählen.",
         phoneTitle: "iPhone", phoneCopy: "Spieler, Format und erstes Aufschlagteam wählen. Ohne Watch auch auf dem iPhone zählen.",
         watchTitle: "Apple Watch", watchCopy: "Die großen Bedienelemente am Court nutzen. Die Aufschlaginfo bleibt sichtbar.",
-        downloadTitle: "Padelly in Aktion sehen", downloadSubline: "Store-Listings kommen bald", mobileDownload: "Vorschau testen",
-        previewQuery: "preview",
       },
       es: {
-        tryPadelly: "Probar Padelly",
-        heroActionSubline: "Vista previa interactiva",
-        previewLabel: "Vista previa interactiva",
+        previewLabel: "Dentro de Padelly",
         tourTitle: "Del primer punto al punto de partido.",
-        tourCopy: "Un recorrido breve por el flujo real de Padelly. Las capturas son de la app. Los controles son una vista previa determinista del producto, no una cuenta ni un partido en línea.",
-        tourOpen: "Abrir la vista previa completa",
+        tourCopy: "Seis pantallas reales de Padelly, con el ritmo tranquilo con el que toma forma un partido.",
         steps: [
           { label: "Inicio rápido", scene: "home", title: "Empezar con el partido que conoces.", copy: "Retoma una configuración reciente o empieza de cero desde la pantalla Jugar.", alt: "Pantalla de inicio de Padelly con Inicio rápido en iPhone" },
           { label: "Configurar", scene: "match-setup", title: "Elegir la forma del partido.", copy: "Selecciona individual o dobles, el formato y quién saca primero antes de la primera bola.", alt: "Pantalla de configuración de partido de Padelly en iPhone" },
@@ -384,25 +359,6 @@
           { label: "Historial", scene: "history", title: "Haz que el resultado siga siendo útil.", copy: "Los partidos terminados se guardan en local con marcador, duración, jugadores e historial.", alt: "Historial de partidos de Padelly en iPhone" },
           { label: "Apariencia", scene: "appearance-colors", title: "Haz tuya la pista.", copy: "Elige apariencia y colores de equipo sin distraer del partido.", alt: "Pantalla de apariencia y colores de equipo de Padelly en iPhone" },
         ],
-        prototypeTitle: "Probar Padelly",
-        prototypeLead: "Una vista previa interactiva breve con capturas reales de la app.",
-        close: "Cerrar vista previa",
-        reset: "Reiniciar demo",
-        back: "Atrás",
-        next: "Continuar",
-        representative: "Vista previa representativa",
-        summaryTitle: "Partido terminado",
-        summaryCopy: "Una pantalla de resultado representativa basada en el flujo actual de finalización de Padelly.",
-        summaryResult: "Alex y Sam ganan",
-        summaryScore: "6–4, 6–3",
-        summaryDuration: "56 min",
-        liveControls: "Controles de demo",
-        scoreThem: "Ellos +1",
-        scoreYou: "Tú +1",
-        undo: "Deshacer",
-        serving: "Cambiar saque",
-        demoState: "Estado de demo",
-        servingLabel: "Saque",
         formatLabel: "Elige tu modo de partido",
         formatTitle: "Cinco formatos reales. Una decisión clara.",
         formatCopy: "Toca un formato para ver sus reglas reales de lanzamiento. La comparación completa y rastreable sigue disponible para cada formato.",
@@ -418,8 +374,6 @@
         deviceTitle: "Configura en iPhone. Cuenta desde la muñeca.",
         phoneTitle: "iPhone", phoneCopy: "Elige jugadores, formato y primer equipo al saque. Sin Watch, también puedes contar desde el teléfono.",
         watchTitle: "Apple Watch", watchCopy: "Usa los controles grandes en pista y mantén la información de saque visible.",
-        downloadTitle: "Mira Padelly en acción", downloadSubline: "Las fichas de las tiendas llegarán pronto", mobileDownload: "Probar vista previa",
-        previewQuery: "preview",
       },
     };
 
@@ -467,10 +421,6 @@
         : "padel-scoring-formats/";
   }
 
-  function homeRoute(locale) {
-    return locale === "en" ? "/" : "/" + locale + "/";
-  }
-
   function mountProductTour(main, copy, locale) {
     const hero = main.querySelector(".hero");
     if (!hero || main.querySelector(".product-tour")) return;
@@ -480,21 +430,27 @@
     const label = createElement("p", "section-label", copy.previewLabel);
     const title = createElement("h2", "product-tour-title", copy.tourTitle);
     const description = createElement("p", "product-tour-copy", copy.tourCopy);
+    const stage = createElement("div", "product-tour-stage");
+    const tabList = createElement("div", "product-tour-tabs");
     const layout = createElement("div", "product-tour-layout");
     const controls = createElement("div", "product-tour-controls");
-    const tabList = createElement("div", "product-tour-tabs");
     const visual = createElement("div", "product-tour-visual");
     const frame = createElement("div", "product-tour-phone");
     const screen = createElement("div", "product-tour-screen");
     const detail = createElement("div", "product-tour-detail");
+    const stepCount = createElement("p", "product-tour-count");
     const detailTitle = createElement("h3");
     const detailCopy = createElement("p");
-    const open = createElement("button", "prototype-open-button", copy.tourOpen);
     const image = createScreenshot(copy.steps[0].scene, locale, copy.steps[0].alt, {
       className: "product-tour-shot",
       loading: "eager",
+      sizes: "(max-width: 680px) 74vw, (max-width: 1040px) 42vw, 420px",
     });
     const buttons = [];
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let activeIndex = 0;
+    let touchStartX = null;
+    let touchPointerId = null;
 
     section.id = "see-padelly";
     section.setAttribute("aria-labelledby", "product-tour-heading");
@@ -503,44 +459,107 @@
     tabList.setAttribute("aria-label", copy.previewLabel);
     screen.id = "product-tour-panel";
     screen.setAttribute("role", "tabpanel");
-    open.type = "button";
-    open.dataset.openPrototype = "true";
-    open.setAttribute("aria-haspopup", "dialog");
+    detail.setAttribute("aria-live", "polite");
+    detail.setAttribute("aria-atomic", "true");
 
     copy.steps.forEach(function (step, index) {
       const button = createElement("button", "product-tour-tab", step.label);
       button.type = "button";
+      button.id = "product-tour-tab-" + index;
       button.setAttribute("role", "tab");
       button.setAttribute("aria-controls", screen.id);
       button.setAttribute("aria-selected", index === 0 ? "true" : "false");
-      button.addEventListener("click", function () { selectStep(index); });
+      button.tabIndex = index === 0 ? 0 : -1;
+      button.addEventListener("click", function () { selectStep(index, true); });
       buttons.push(button);
       tabList.append(button);
     });
 
-    function selectStep(index) {
-      const step = copy.steps[index];
+    function selectStep(index, shouldAnimate) {
+      activeIndex = Math.max(0, Math.min(index, copy.steps.length - 1));
+      const step = copy.steps[activeIndex];
       buttons.forEach(function (button, buttonIndex) {
-        button.setAttribute("aria-selected", buttonIndex === index ? "true" : "false");
+        const isSelected = buttonIndex === activeIndex;
+        button.setAttribute("aria-selected", isSelected ? "true" : "false");
+        button.tabIndex = isSelected ? 0 : -1;
       });
+      screen.setAttribute("aria-labelledby", buttons[activeIndex].id);
       image.dataset.screenshotScene = step.scene;
       image.alt = step.alt;
       image.src = screenshotBase(step.scene, locale, "ios") + "-640.webp";
       image.srcset = screenshotBase(step.scene, locale, "ios") + "-640.webp 640w, " + screenshotBase(step.scene, locale, "ios") + "-960.webp 960w";
+      stepCount.textContent = (activeIndex + 1) + " / " + copy.steps.length;
       detailTitle.textContent = step.title;
       detailCopy.textContent = step.copy;
+
+      if (shouldAnimate && !reduceMotion.matches) {
+        screen.classList.remove("is-changing");
+        void screen.offsetWidth;
+        screen.classList.add("is-changing");
+      }
+
+      if (shouldAnimate && tabList.scrollWidth > tabList.clientWidth) {
+        buttons[activeIndex].scrollIntoView({
+          block: "nearest",
+          inline: "center",
+          behavior: reduceMotion.matches ? "auto" : "smooth",
+        });
+      }
     }
+
+    tabList.addEventListener("keydown", function (event) {
+      const currentIndex = buttons.indexOf(document.activeElement);
+      if (currentIndex === -1) return;
+
+      let nextIndex = null;
+      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % buttons.length;
+      if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = buttons.length - 1;
+      if (nextIndex === null) return;
+
+      event.preventDefault();
+      selectStep(nextIndex, true);
+      buttons[nextIndex].focus();
+    });
+
+    screen.addEventListener("animationend", function () {
+      screen.classList.remove("is-changing");
+    });
+
+    screen.addEventListener("pointerdown", function (event) {
+      if (event.pointerType !== "touch") return;
+      touchStartX = event.clientX;
+      touchPointerId = event.pointerId;
+      if (typeof screen.setPointerCapture === "function") screen.setPointerCapture(event.pointerId);
+    });
+
+    screen.addEventListener("pointerup", function (event) {
+      if (event.pointerId !== touchPointerId || touchStartX === null) return;
+      const distance = event.clientX - touchStartX;
+      touchStartX = null;
+      touchPointerId = null;
+      if (Math.abs(distance) < 44) return;
+      if (distance < 0 && activeIndex < buttons.length - 1) selectStep(activeIndex + 1, true);
+      if (distance > 0 && activeIndex > 0) selectStep(activeIndex - 1, true);
+    });
+
+    screen.addEventListener("pointercancel", function () {
+      touchStartX = null;
+      touchPointerId = null;
+    });
 
     intro.append(label, title, description);
     screen.append(image);
     frame.append(screen);
     visual.append(frame);
-    detail.append(detailTitle, detailCopy, open);
-    controls.append(tabList, detail);
+    detail.append(stepCount, detailTitle, detailCopy);
+    controls.append(detail);
     layout.append(controls, visual);
-    section.append(intro, layout);
+    stage.append(tabList, layout);
+    section.append(intro, stage);
     hero.insertAdjacentElement("afterend", section);
-    selectStep(0);
+    selectStep(0, false);
   }
 
   function mountFormatExplorer(main, copy, locale) {
@@ -627,230 +646,6 @@
     anchor.insertAdjacentElement("afterend", section);
   }
 
-  function mountPrototype(copy, locale) {
-    if (document.querySelector(".prototype-dialog")) return null;
-
-    const dialog = createElement("dialog", "prototype-dialog");
-    const shell = createElement("div", "prototype-shell");
-    const header = createElement("header", "prototype-header");
-    const meta = createElement("div", "prototype-meta");
-    const label = createElement("p", "prototype-label", copy.previewLabel);
-    const title = createElement("h2", "prototype-title", copy.prototypeTitle);
-    const lead = createElement("p", "prototype-lead", copy.prototypeLead);
-    const actions = createElement("div", "prototype-header-actions");
-    const reset = createElement("button", "prototype-reset", copy.reset);
-    const headerNext = createElement("button", "prototype-header-next", "→");
-    const close = createElement("button", "prototype-close", "×");
-    const body = createElement("div", "prototype-body");
-    const progress = createElement("p", "prototype-progress");
-    const phone = createElement("div", "prototype-phone");
-    const phoneScreen = createElement("div", "prototype-phone-screen");
-    const screen = createElement("div", "prototype-screen");
-    const caption = createElement("div", "prototype-caption");
-    const captionTitle = createElement("h3");
-    const captionCopy = createElement("p");
-    const navigation = createElement("div", "prototype-navigation");
-    const back = createElement("button", "prototype-back", copy.back);
-    const next = createElement("button", "prototype-next", copy.next);
-    const screenDefinitions = [
-      { key: "quick-start", scene: "home", title: copy.steps[0].title, copy: copy.steps[0].copy, alt: copy.steps[0].alt, next: copy.steps[1].label },
-      { key: "setup", scene: "match-setup", title: copy.steps[1].title, copy: copy.steps[1].copy, alt: copy.steps[1].alt, next: copy.steps[2].label },
-      { key: "players", scene: "match-setup", title: copy.steps[1].title, copy: copy.steps[1].copy, alt: copy.steps[1].alt, next: copy.steps[2].label },
-      { key: "live", scene: "live-score", title: copy.steps[2].title, copy: copy.steps[3].copy, alt: copy.steps[3].alt, next: copy.summaryTitle },
-      { key: "summary", title: copy.summaryTitle, copy: copy.summaryCopy, next: copy.steps[4].label },
-      { key: "history", scene: "history", title: copy.steps[4].title, copy: copy.steps[4].copy, alt: copy.steps[4].alt, next: copy.steps[5].label },
-      { key: "settings", scene: "appearance-colors", title: copy.steps[5].title, copy: copy.steps[5].copy, alt: copy.steps[5].alt, next: copy.reset },
-    ];
-    const scoreLabels = ["0", "15", "30", "40"];
-    let index = 0;
-    let scoreThem = 2;
-    let scoreYou = 1;
-    let serving = "Alex";
-    let actionsHistory = [];
-    let opener = null;
-
-    dialog.hidden = true;
-    dialog.setAttribute("aria-labelledby", "prototype-dialog-title");
-    dialog.setAttribute("aria-describedby", "prototype-dialog-lead");
-    title.id = "prototype-dialog-title";
-    lead.id = "prototype-dialog-lead";
-    close.type = "button";
-    close.setAttribute("aria-label", copy.close);
-    reset.type = "button";
-    headerNext.type = "button";
-    headerNext.setAttribute("aria-label", copy.next);
-    back.type = "button";
-    next.type = "button";
-    screen.setAttribute("aria-live", "polite");
-    screen.setAttribute("aria-atomic", "true");
-
-    meta.append(label, title, lead);
-    actions.append(reset, headerNext, close);
-    header.append(meta, actions);
-    phoneScreen.append(screen);
-    phone.append(phoneScreen);
-    caption.append(captionTitle, captionCopy);
-    navigation.append(back, next);
-    body.append(progress, phone, caption, navigation);
-    shell.append(header, body);
-    dialog.append(shell);
-    document.body.append(dialog);
-
-    function resetDemo() {
-      index = 0;
-      scoreThem = 2;
-      scoreYou = 1;
-      serving = "Alex";
-      actionsHistory = [];
-      render();
-    }
-
-    function demoStatus() {
-      return copy.demoState + ": " + scoreLabels[scoreThem] + "–" + scoreLabels[scoreYou] + " · " + copy.servingLabel + ": " + serving;
-    }
-
-    function addLiveControls() {
-      const controls = createElement("div", "prototype-live-controls");
-      const status = createElement("p", "prototype-live-status", demoStatus());
-      const titleText = createElement("span", "prototype-live-controls-title", copy.liveControls);
-      const scoring = createElement("div", "prototype-live-buttons");
-      const them = createElement("button", null, copy.scoreThem);
-      const you = createElement("button", null, copy.scoreYou);
-      const undo = createElement("button", null, copy.undo);
-      const switchServing = createElement("button", null, copy.serving);
-
-      [them, you, undo, switchServing].forEach(function (button) { button.type = "button"; });
-      them.addEventListener("click", function () {
-        actionsHistory.push({ scoreThem: scoreThem, scoreYou: scoreYou, serving: serving });
-        scoreThem = Math.min(scoreThem + 1, scoreLabels.length - 1);
-        status.textContent = demoStatus();
-      });
-      you.addEventListener("click", function () {
-        actionsHistory.push({ scoreThem: scoreThem, scoreYou: scoreYou, serving: serving });
-        scoreYou = Math.min(scoreYou + 1, scoreLabels.length - 1);
-        status.textContent = demoStatus();
-      });
-      undo.addEventListener("click", function () {
-        const previous = actionsHistory.pop();
-        if (previous) {
-          scoreThem = previous.scoreThem;
-          scoreYou = previous.scoreYou;
-          serving = previous.serving;
-        }
-        status.textContent = demoStatus();
-      });
-      switchServing.addEventListener("click", function () {
-        actionsHistory.push({ scoreThem: scoreThem, scoreYou: scoreYou, serving: serving });
-        serving = serving === "Alex" ? "Sam" : "Alex";
-        status.textContent = demoStatus();
-      });
-      scoring.append(them, you);
-      controls.append(titleText, status, scoring, undo, switchServing);
-      screen.append(controls);
-    }
-
-    function addSummary() {
-      const summary = createElement("div", "prototype-summary");
-      const labelText = createElement("p", "prototype-summary-label", copy.representative);
-      const result = createElement("h4", null, copy.summaryResult);
-      const score = createElement("strong", null, copy.summaryScore);
-      const duration = createElement("span", null, copy.summaryDuration);
-      const done = createElement("span", "prototype-summary-mark", "✓");
-      summary.append(labelText, done, result, score, duration);
-      screen.append(summary);
-    }
-
-    function render() {
-      const definition = screenDefinitions[index];
-      screen.replaceChildren();
-      progress.textContent = (index + 1) + " / " + screenDefinitions.length;
-      captionTitle.textContent = definition.title;
-      captionCopy.textContent = definition.copy;
-      back.disabled = index === 0;
-      next.textContent = definition.next || copy.next;
-      headerNext.hidden = index === screenDefinitions.length - 1;
-      headerNext.setAttribute("aria-label", definition.next || copy.next);
-
-      if (definition.scene) {
-        const image = createScreenshot(definition.scene, locale, definition.alt, {
-          className: "prototype-shot",
-          loading: "eager",
-          sizes: "(max-width: 680px) 74vw, 340px",
-        });
-        screen.append(image);
-        if (definition.key === "live") addLiveControls();
-      } else {
-        addSummary();
-      }
-
-      updateScreenshots();
-    }
-
-    function closePrototype() {
-      if (typeof dialog.close === "function" && dialog.open) {
-        dialog.close();
-      } else {
-        dialog.hidden = true;
-        document.body.classList.remove("has-prototype-open");
-        if (opener) opener.focus();
-      }
-    }
-
-    function advancePrototype() {
-      if (index === screenDefinitions.length - 1) resetDemo();
-      else {
-        index += 1;
-        render();
-      }
-    }
-
-    function openPrototype(trigger) {
-      opener = trigger || document.activeElement;
-      resetDemo();
-      dialog.hidden = false;
-      if (typeof dialog.showModal === "function" && !dialog.open) {
-        dialog.showModal();
-      } else {
-        document.body.classList.add("has-prototype-open");
-      }
-      window.requestAnimationFrame(function () { close.focus(); });
-    }
-
-    close.addEventListener("click", closePrototype);
-    reset.addEventListener("click", resetDemo);
-    headerNext.addEventListener("click", advancePrototype);
-    back.addEventListener("click", function () {
-      if (index > 0) {
-        index -= 1;
-        render();
-      }
-    });
-    next.addEventListener("click", advancePrototype);
-    dialog.addEventListener("click", function (event) {
-      if (event.target === dialog) closePrototype();
-    });
-    dialog.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        closePrototype();
-      }
-    });
-    dialog.addEventListener("close", function () {
-      dialog.hidden = true;
-      document.body.classList.remove("has-prototype-open");
-      if (opener) opener.focus();
-    });
-    document.addEventListener("click", function (event) {
-      const trigger = event.target.closest("[data-open-prototype]");
-      if (!trigger) return;
-      event.preventDefault();
-      openPrototype(trigger);
-    });
-
-    render();
-    return { open: openPrototype };
-  }
-
   function configureStoreLinks() {
     if (storeConfig.appStoreId && !document.querySelector('meta[name="apple-itunes-app"]')) {
       const smartBanner = document.createElement("meta");
@@ -873,63 +668,6 @@
         badge.replaceWith(link);
       });
     });
-  }
-
-  function createPreviewAction(copy, locale, isHomepage, className) {
-    if (isHomepage) {
-      const button = createElement("button", className, copy.tryPadelly);
-      button.type = "button";
-      button.dataset.openPrototype = "true";
-      button.setAttribute("aria-haspopup", "dialog");
-      return button;
-    }
-
-    const link = createElement("a", className, copy.tryPadelly);
-    link.href = homeRoute(locale) + "?preview=1#see-padelly";
-    return link;
-  }
-
-  function mountDownloadSystem(copy, locale, isHomepage) {
-    const headerBar = document.querySelector(".header-bar");
-    if (!headerBar || headerBar.querySelector(".header-download")) return;
-
-    const headerAction = createPreviewAction(copy, locale, isHomepage, "header-download");
-    const headerSmall = createElement("small", null, copy.downloadSubline);
-    const mobile = createElement("div", "mobile-download-bar");
-    const mobileCopy = createElement("span", "mobile-download-copy");
-    const mobileTitle = createElement("strong", null, copy.downloadTitle);
-    const mobileSmall = createElement("small", null, copy.downloadSubline);
-    const mobileAction = createPreviewAction(copy, locale, isHomepage, "mobile-download-action");
-
-    headerAction.append(headerSmall);
-    mobileCopy.append(mobileTitle, mobileSmall);
-    mobileAction.textContent = copy.mobileDownload;
-    mobile.append(mobileCopy, mobileAction);
-    headerBar.append(headerAction);
-    document.body.append(mobile);
-  }
-
-  function mountHeroPrototypeTrigger(main, copy) {
-    const hero = main.querySelector(".hero");
-    const storePanel = hero && hero.querySelector(".store-panel");
-    const closingCard = main.querySelector(".cta-card");
-    if (!hero || !storePanel || hero.querySelector(".hero-prototype-action")) return;
-
-    const action = createElement("button", "hero-prototype-action", copy.tryPadelly);
-    const actionSmall = createElement("span", null, copy.heroActionSubline);
-    action.type = "button";
-    action.dataset.openPrototype = "true";
-    action.setAttribute("aria-haspopup", "dialog");
-    action.append(actionSmall);
-    storePanel.insertAdjacentElement("afterend", action);
-
-    if (closingCard && !closingCard.querySelector(".cta-prototype-action")) {
-      const closingAction = createElement("button", "cta-prototype-action", copy.tryPadelly);
-      closingAction.type = "button";
-      closingAction.dataset.openPrototype = "true";
-      closingAction.setAttribute("aria-haspopup", "dialog");
-      closingCard.append(closingAction);
-    }
   }
 
   function mountJourneyProgress() {
@@ -965,25 +703,20 @@
     const isHomepage = Boolean(main && main.querySelector(".hero") && main.querySelector(".facts-panel"));
 
     configureStoreLinks();
-    mountDownloadSystem(copy, locale, isHomepage);
     if (!isHomepage) return;
 
-    const prototype = mountPrototype(copy, locale);
-    mountHeroPrototypeTrigger(main, copy);
     mountProductTour(main, copy, locale);
     mountFormatExplorer(main, copy, locale);
-    mountDeviceComparison(main, copy, locale);
+    // Re-enable when dedicated iPhone and Apple Watch comparison captures are available.
+    // mountDeviceComparison(main, copy, locale);
     mountJourneyProgress();
-
-    if (prototype && new URLSearchParams(window.location.search).get(copy.previewQuery) === "1") {
-      window.requestAnimationFrame(function () { prototype.open(); });
-    }
   }
 
   function onSystemAppearanceChange() {
     if (currentAppearance === "system") {
       updateThemeColor();
       updateScreenshots();
+      updateVisibleAppIcons();
     }
   }
 
@@ -1118,6 +851,7 @@
             savePreference(appearanceKey, currentAppearance);
             updateThemeColor();
             updateScreenshots();
+            updateVisibleAppIcons();
             syncPicker(picker, currentAppearance);
             closeMenu(picker, true);
           } else if (type === "preset") {
@@ -1126,6 +860,10 @@
             savePreference(presetKey, currentPreset);
             syncPicker(picker, currentPreset);
             closeMenu(picker, true);
+          } else if (type === "language") {
+            const language = ["en", "de", "es"].includes(value) ? value : null;
+            if (language) savePreference(languageKey, language);
+            closeMenu(picker, false);
           } else {
             closeMenu(picker, false);
           }
@@ -1144,6 +882,13 @@
         event.preventDefault();
         closeMenu(openPicker, true);
       }
+    });
+
+    document.querySelectorAll(".footer-languages a[lang]").forEach(function (link) {
+      link.addEventListener("click", function () {
+        const language = link.lang;
+        if (["en", "de", "es"].includes(language)) savePreference(languageKey, language);
+      });
     });
 
     enhanceHeroPresentation();
