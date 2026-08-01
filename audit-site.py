@@ -288,8 +288,14 @@ def main() -> int:
         if footer_legal_links != [legal_target]:
             errors.append(f"{route}: footer legal link is missing or incorrect")
 
-        preference_scripts = [s for s in parser.scripts if s.get("src", "").endswith("assets/preferences.js")]
-        site_scripts = [s for s in parser.scripts if s.get("src", "").endswith("assets/site.js")]
+        preference_scripts = [
+            script for script in parser.scripts
+            if urlparse(script.get("src", "")).path.endswith("assets/preferences.js")
+        ]
+        site_scripts = [
+            script for script in parser.scripts
+            if urlparse(script.get("src", "")).path.endswith("assets/site.js")
+        ]
         if len(preference_scripts) != 1 or "defer" in preference_scripts[0]:
             errors.append(f"{route}: minimal preference script must be synchronous")
         if len(site_scripts) != 1 or "defer" not in site_scripts[0]:
