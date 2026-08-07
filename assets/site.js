@@ -48,25 +48,26 @@
   }
 
   function updateScreenshots() {
-    const locale = ["en", "de", "es"].includes(root.lang) ? root.lang : "en";
-    const appearance = effectiveAppearance();
-
     document.querySelectorAll("[data-screenshot-scene][data-screenshot-platform]").forEach(function (image) {
+      updateScreenshot(image);
+    });
+  }
+
+  function updateScreenshot(image) {
       const scene = image.dataset.screenshotScene;
-      const platform = image.dataset.screenshotPlatform;
       const widths = (image.dataset.screenshotWidths || "")
         .split(",")
         .map(function (value) { return value.trim(); })
         .filter(Boolean);
 
-      if (!scene || !platform || !widths.length) return;
+      if (!scene || !widths.length) return;
 
-      const base = "/assets/screenshots/" + platform + "/" + scene + "-" + locale + "-" + appearance;
+      const base = screenshotBase(scene);
       image.src = base + "-" + widths[0] + ".webp";
       image.srcset = widths.map(function (width) {
         return base + "-" + width + ".webp " + width + "w";
       }).join(", ");
-    });
+      image.hidden = false;
   }
 
   function updateVisibleAppIcons() {
@@ -301,7 +302,7 @@
           { label: "Live score", scene: "live-score", title: "Keep the court in view.", copy: "Large, clear scoring controls make the next point a quick tap, with serving information always close by.", alt: "Padelly live score screen on iPhone" },
           { label: "Undo + serve", scene: "live-score", title: "Recover the point, not the rhythm.", copy: "Undo returns score and serving state across games, sets, and tie-breaks.", alt: "Padelly live score screen with undo and serving information on iPhone" },
           { label: "History", scene: "history", title: "Let the result stay useful.", copy: "Finished matches stay local with scores, duration, player records, and useful history.", alt: "Padelly match history screen on iPhone" },
-          { label: "Appearance", scene: "appearance-colors", title: "Make the court yours.", copy: "Choose appearance and team colours without getting in the way of the match.", alt: "Padelly appearance and team colours screen on iPhone" },
+          { label: "Appearance", scene: "settings-colors", title: "Make the court yours.", copy: "Choose appearance and team colours without getting in the way of the match.", alt: "Padelly appearance and team colours screen on iPhone" },
         ],
         formatLabel: "Choose your match mode",
         formatTitle: "Five real formats. One clear decision.",
@@ -329,7 +330,7 @@
           { label: "Live zählen", scene: "live-score", title: "Den Court im Blick behalten.", copy: "Große, klare Bedienelemente machen den nächsten Punkt zum schnellen Tap. Die Aufschlaginfo bleibt nah.", alt: "Padelly-Live-Zähler auf dem iPhone" },
           { label: "Undo + Aufschlag", scene: "live-score", title: "Den Punkt korrigieren, nicht den Rhythmus.", copy: "Undo stellt Punktestand und Aufschlag auch über Spiele, Sätze und Tiebreaks hinweg wieder her.", alt: "Padelly-Live-Zähler mit Undo und Aufschlag auf dem iPhone" },
           { label: "Verlauf", scene: "history", title: "Das Ergebnis sinnvoll behalten.", copy: "Abgeschlossene Matches bleiben lokal mit Punkten, Dauer, Spielerprofilen und Verlauf.", alt: "Padelly-Matchverlauf auf dem iPhone" },
-          { label: "Darstellung", scene: "appearance-colors", title: "Den Court zu deinem machen.", copy: "Darstellung und Teamfarben wählen, ohne das Match zu überladen.", alt: "Padelly-Darstellung und Teamfarben auf dem iPhone" },
+          { label: "Darstellung", scene: "settings-colors", title: "Den Court zu deinem machen.", copy: "Darstellung und Teamfarben wählen, ohne das Match zu überladen.", alt: "Padelly-Darstellung und Teamfarben auf dem iPhone" },
         ],
         formatLabel: "Matchmodus wählen",
         formatTitle: "Fünf echte Formate. Eine klare Entscheidung.",
@@ -357,7 +358,7 @@
           { label: "Marcador", scene: "live-score", title: "Mantén la atención en la pista.", copy: "Los controles grandes y claros convierten el siguiente punto en un toque rápido, con el saque siempre a mano.", alt: "Pantalla de marcador en directo de Padelly en iPhone" },
           { label: "Deshacer + saque", scene: "live-score", title: "Recupera el punto, no el ritmo.", copy: "Deshacer restaura marcador y saque incluso entre juegos, sets y tiebreaks.", alt: "Marcador en directo de Padelly con deshacer y saque en iPhone" },
           { label: "Historial", scene: "history", title: "Haz que el resultado siga siendo útil.", copy: "Los partidos terminados se guardan en local con marcador, duración, jugadores e historial.", alt: "Historial de partidos de Padelly en iPhone" },
-          { label: "Apariencia", scene: "appearance-colors", title: "Haz tuya la pista.", copy: "Elige apariencia y colores de equipo sin distraer del partido.", alt: "Pantalla de apariencia y colores de equipo de Padelly en iPhone" },
+          { label: "Apariencia", scene: "settings-colors", title: "Haz tuya la pista.", copy: "Elige apariencia y colores de equipo sin distraer del partido.", alt: "Pantalla de apariencia y colores de equipo de Padelly en iPhone" },
         ],
         formatLabel: "Elige tu modo de partido",
         formatTitle: "Cinco formatos reales. Una decisión clara.",
@@ -387,16 +388,16 @@
     return element;
   }
 
-  function screenshotBase(scene, locale, platform) {
-    return "/assets/screenshots/" + platform + "/" + scene + "-" + locale + "-" + effectiveAppearance();
+  function screenshotBase(scene) {
+    return "/assets/screenshots/" + scene + "-" + currentPreset;
   }
 
   function createScreenshot(scene, locale, alt, options) {
     const settings = options || {};
     const platform = settings.platform || "ios";
-    const widths = settings.widths || (platform === "watchos" ? [416] : [640, 960]);
+    const widths = settings.widths || (platform === "watchos" ? [320, 416] : scene === "home" ? [640, 960] : [480, 720]);
     const image = document.createElement("img");
-    const base = screenshotBase(scene, locale, platform);
+    const base = screenshotBase(scene);
 
     image.className = settings.className || "";
     image.dataset.screenshotScene = scene;
@@ -406,7 +407,7 @@
     image.srcset = widths.map(function (width) { return base + "-" + width + ".webp " + width + "w"; }).join(", ");
     image.sizes = settings.sizes || "(max-width: 820px) 84vw, 420px";
     image.width = widths[0];
-    image.height = settings.height || (platform === "watchos" ? 416 : 1392);
+    image.height = settings.height || (platform === "watchos" ? 382 : widths[0] === 640 ? 1392 : 1044);
     image.alt = alt;
     image.loading = settings.loading || "lazy";
     image.decoding = "async";
@@ -486,8 +487,7 @@
       screen.setAttribute("aria-labelledby", buttons[activeIndex].id);
       image.dataset.screenshotScene = step.scene;
       image.alt = step.alt;
-      image.src = screenshotBase(step.scene, locale, "ios") + "-640.webp";
-      image.srcset = screenshotBase(step.scene, locale, "ios") + "-640.webp 640w, " + screenshotBase(step.scene, locale, "ios") + "-960.webp 960w";
+      updateScreenshot(image);
       stepCount.textContent = (activeIndex + 1) + " / " + copy.steps.length;
       detailTitle.textContent = step.title;
       detailCopy.textContent = step.copy;
@@ -640,7 +640,7 @@
     heading.append(label, title);
     cards.append(
       makeCard("phone", copy.phoneTitle, copy.phoneCopy, createScreenshot("live-score", locale, copy.phoneTitle + " Padelly live score", { className: "device-comparison-phone-shot" })),
-      makeCard("watch", copy.watchTitle, copy.watchCopy, createScreenshot("live-score", locale, copy.watchTitle + " Padelly live score", { platform: "watchos", widths: [416], className: "device-comparison-watch-shot", sizes: "260px" }))
+      makeCard("watch", copy.watchTitle, copy.watchCopy, createScreenshot("watch-point-score", locale, copy.watchTitle + " Padelly live score", { platform: "watchos", className: "device-comparison-watch-shot", sizes: "260px" }))
     );
     section.append(heading, cards);
     anchor.insertAdjacentElement("afterend", section);
@@ -715,7 +715,6 @@
   function onSystemAppearanceChange() {
     if (currentAppearance === "system") {
       updateThemeColor();
-      updateScreenshots();
       updateVisibleAppIcons();
     }
   }
@@ -850,7 +849,6 @@
             root.dataset.appearance = currentAppearance;
             savePreference(appearanceKey, currentAppearance);
             updateThemeColor();
-            updateScreenshots();
             updateVisibleAppIcons();
             syncPicker(picker, currentAppearance);
             closeMenu(picker, true);
@@ -858,6 +856,7 @@
             currentPreset = presets.includes(value) ? value : "ultra";
             root.dataset.preset = currentPreset;
             savePreference(presetKey, currentPreset);
+            updateScreenshots();
             syncPicker(picker, currentPreset);
             closeMenu(picker, true);
           } else if (type === "language") {

@@ -38,12 +38,13 @@ WATCH_SCREENSHOT_ROUTES = {
 }
 HOME_SCREENSHOT_SCENES = [
     ("ios", "home", ["640", "960"]),
-    ("ios", "history", ["640", "960"]),
-    ("ios", "fitness-icloud", ["640", "960"]),
-    ("ios", "appearance-colors", ["640", "960"]),
-    ("ios", "alternate-icons", ["640", "960"]),
+    ("ios", "history", ["480", "720"]),
+    ("ios", "settings-colors", ["480", "720"]),
+    ("ios", "settings-colors", ["480", "720"]),
+    ("ios", "live-score", ["480", "720"]),
 ]
-WATCH_SCREENSHOT_SCENES = [("watchos", "live-score", ["416"])]
+WATCH_SCREENSHOT_SCENES = [("watchos", "watch-point-score", ["320", "416"])]
+SCREENSHOT_PROFILES = ("neon", "court", "ultra")
 TURNSTILE_SITE_KEY = "0x4AAAAAAD7gbCEDTdTNu6rM"
 TURNSTILE_ACTION = "turnstile-spin-v2"
 TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js"
@@ -263,11 +264,10 @@ def main() -> int:
         if actual_screenshots != expected_screenshots:
             errors.append(f"{route}: managed screenshot contract mismatch: {actual_screenshots}")
 
-        locale = "de" if route.startswith("/de/") else "es" if route.startswith("/es/") else "en"
-        for platform, scene, widths in expected_screenshots:
-            for appearance in ("light", "dark"):
+        for _platform, scene, widths in expected_screenshots:
+            for profile in SCREENSHOT_PROFILES:
                 for width in widths:
-                    asset = ROOT / "assets" / "screenshots" / platform / f"{scene}-{locale}-{appearance}-{width}.webp"
+                    asset = ROOT / "assets" / "screenshots" / f"{scene}-{profile}-{width}.webp"
                     if not asset.is_file() or asset.stat().st_size == 0:
                         errors.append(f"{route}: missing screenshot asset {asset.relative_to(ROOT)}")
 
