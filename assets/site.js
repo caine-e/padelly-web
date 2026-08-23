@@ -275,17 +275,6 @@
     }
   }
 
-  // Store values deliberately live in one configuration object. Leave every
-  // value null until a public listing exists: the UI stays useful without
-  // inventing a store URL or turning a placeholder into a broken link.
-  const storeConfig = Object.freeze({
-    appStoreUrl: null,
-    googlePlayUrl: null,
-    appStoreId: null,
-    universalLinkBase: null,
-    androidAppLinkBase: null,
-  });
-
   function currentLocale() {
     return ["en", "de", "es"].includes(root.lang) ? root.lang : "en";
   }
@@ -295,13 +284,14 @@
       en: {
         previewLabel: "Inside Padelly",
         tourTitle: "From first point to match point.",
-        tourCopy: "Six real Padelly screens, in the same calm rhythm as a match takes shape.",
+        tourCopy: "Seven real Padelly screens, in the same calm rhythm as a match takes shape.",
         steps: [
           { label: "Quick Start", scene: "home", title: "Begin with the match you know.", copy: "Pick up a recent setup or start fresh from the Play screen.", alt: "Padelly home screen with Quick Start on iPhone" },
           { label: "Set up", scene: "match-setup", title: "Choose the shape of the match.", copy: "Select singles or doubles, the format, and who serves first before the first ball.", alt: "Padelly match setup screen on iPhone" },
           { label: "Live score", scene: "live-score", title: "Keep the court in view.", copy: "Large, clear scoring controls make the next point a quick tap, with serving information always close by.", alt: "Padelly live score screen on iPhone" },
           { label: "Undo + serve", scene: "live-score", title: "Recover the point, not the rhythm.", copy: "Undo returns score and serving state across games, sets, and tie-breaks.", alt: "Padelly live score screen with undo and serving information on iPhone" },
           { label: "History", scene: "history", title: "Let the result stay useful.", copy: "Finished matches stay local with scores, duration, player records, and useful history.", alt: "Padelly match history screen on iPhone" },
+          { label: "Analytics", scene: "analytics", title: "See the patterns after the match.", copy: "Overview, form, personal records, and point quality turn completed matches into useful context.", alt: "Padelly Analytics tab on iPhone" },
           { label: "Appearance", scene: "settings-colors", title: "Make the court yours.", copy: "Choose appearance and team colours without getting in the way of the match.", alt: "Padelly appearance and team colours screen on iPhone" },
         ],
         formatLabel: "Choose your match mode",
@@ -323,13 +313,14 @@
       de: {
         previewLabel: "In Padelly",
         tourTitle: "Vom ersten Punkt zum Matchball.",
-        tourCopy: "Sechs echte Padelly-Screens, im ruhigen Rhythmus eines Matches.",
+        tourCopy: "Sieben echte Padelly-Screens, im ruhigen Rhythmus eines Matches.",
         steps: [
           { label: "Schnellstart", scene: "home", title: "Mit dem vertrauten Match beginnen.", copy: "Eine letzte Konfiguration fortsetzen oder im Play-Bereich neu starten.", alt: "Padelly-Startbildschirm mit Schnellstart auf dem iPhone" },
           { label: "Einrichten", scene: "match-setup", title: "Die Form des Matches wählen.", copy: "Einzel oder Doppel, Format und erstes Aufschlagteam vor dem ersten Ball festlegen.", alt: "Padelly-Match-Einrichtung auf dem iPhone" },
           { label: "Live zählen", scene: "live-score", title: "Den Court im Blick behalten.", copy: "Große, klare Bedienelemente machen den nächsten Punkt zum schnellen Tap. Die Aufschlaginfo bleibt nah.", alt: "Padelly-Live-Zähler auf dem iPhone" },
           { label: "Undo + Aufschlag", scene: "live-score", title: "Den Punkt korrigieren, nicht den Rhythmus.", copy: "Undo stellt Punktestand und Aufschlag auch über Spiele, Sätze und Tiebreaks hinweg wieder her.", alt: "Padelly-Live-Zähler mit Undo und Aufschlag auf dem iPhone" },
           { label: "Verlauf", scene: "history", title: "Das Ergebnis sinnvoll behalten.", copy: "Abgeschlossene Matches bleiben lokal mit Punkten, Dauer, Spielerprofilen und Verlauf.", alt: "Padelly-Matchverlauf auf dem iPhone" },
+          { label: "Analytics", scene: "analytics", title: "Muster nach dem Match erkennen.", copy: "Übersicht, Form, persönliche Bestwerte und Point Quality machen abgeschlossene Matches nützlicher.", alt: "Padelly-Analytics auf dem iPhone" },
           { label: "Darstellung", scene: "settings-colors", title: "Den Court zu deinem machen.", copy: "Darstellung und Teamfarben wählen, ohne das Match zu überladen.", alt: "Padelly-Darstellung und Teamfarben auf dem iPhone" },
         ],
         formatLabel: "Matchmodus wählen",
@@ -351,13 +342,14 @@
       es: {
         previewLabel: "Dentro de Padelly",
         tourTitle: "Del primer punto al punto de partido.",
-        tourCopy: "Seis pantallas reales de Padelly, con el ritmo tranquilo con el que toma forma un partido.",
+        tourCopy: "Siete pantallas reales de Padelly, con el ritmo tranquilo con el que toma forma un partido.",
         steps: [
           { label: "Inicio rápido", scene: "home", title: "Empezar con el partido que conoces.", copy: "Retoma una configuración reciente o empieza de cero desde la pantalla Jugar.", alt: "Pantalla de inicio de Padelly con Inicio rápido en iPhone" },
           { label: "Configurar", scene: "match-setup", title: "Elegir la forma del partido.", copy: "Selecciona individual o dobles, el formato y quién saca primero antes de la primera bola.", alt: "Pantalla de configuración de partido de Padelly en iPhone" },
           { label: "Marcador", scene: "live-score", title: "Mantén la atención en la pista.", copy: "Los controles grandes y claros convierten el siguiente punto en un toque rápido, con el saque siempre a mano.", alt: "Pantalla de marcador en directo de Padelly en iPhone" },
           { label: "Deshacer + saque", scene: "live-score", title: "Recupera el punto, no el ritmo.", copy: "Deshacer restaura marcador y saque incluso entre juegos, sets y tiebreaks.", alt: "Marcador en directo de Padelly con deshacer y saque en iPhone" },
           { label: "Historial", scene: "history", title: "Haz que el resultado siga siendo útil.", copy: "Los partidos terminados se guardan en local con marcador, duración, jugadores e historial.", alt: "Historial de partidos de Padelly en iPhone" },
+          { label: "Analytics", scene: "analytics", title: "Descubre patrones después del partido.", copy: "El resumen, la forma, los récords personales y la calidad de los puntos convierten el historial en contexto útil.", alt: "Analytics de Padelly en iPhone" },
           { label: "Apariencia", scene: "settings-colors", title: "Haz tuya la pista.", copy: "Elige apariencia y colores de equipo sin distraer del partido.", alt: "Pantalla de apariencia y colores de equipo de Padelly en iPhone" },
         ],
         formatLabel: "Elige tu modo de partido",
@@ -647,27 +639,7 @@
   }
 
   function configureStoreLinks() {
-    if (storeConfig.appStoreId && !document.querySelector('meta[name="apple-itunes-app"]')) {
-      const smartBanner = document.createElement("meta");
-      smartBanner.name = "apple-itunes-app";
-      smartBanner.content = "app-id=" + storeConfig.appStoreId;
-      document.head.append(smartBanner);
-    }
-
-    document.querySelectorAll(".store-row").forEach(function (row) {
-      const badges = row.querySelectorAll(".store-badge");
-      [storeConfig.appStoreUrl, storeConfig.googlePlayUrl].forEach(function (url, index) {
-        const badge = badges[index];
-        if (!badge) return;
-        badge.dataset.storeState = url ? "available" : "coming-soon";
-        if (!url || badge.tagName === "A") return;
-        const link = document.createElement("a");
-        link.className = badge.className.replace("store-badge-unavailable", "").trim();
-        link.href = url;
-        link.append(...Array.from(badge.childNodes));
-        badge.replaceWith(link);
-      });
-    });
+    // Store links are intentionally absent until a verified public listing exists.
   }
 
   function mountJourneyProgress() {

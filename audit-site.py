@@ -42,6 +42,7 @@ HOME_SCREENSHOT_SCENES = [
     ("ios", "settings-colors", ["480", "720"]),
     ("ios", "settings-colors", ["480", "720"]),
     ("ios", "live-score", ["480", "720"]),
+    ("ios", "analytics", ["480", "720"]),
 ]
 WATCH_SCREENSHOT_SCENES = [("watchos", "watch-point-score", ["320", "416"])]
 SCREENSHOT_PROFILES = ("neon", "court", "ultra")
@@ -241,6 +242,8 @@ def main() -> int:
             errors.append(f"{route}: contains href=\"#\"")
         if re.search(r'<a[^>]+class=["\'][^"\']*store-badge', source):
             errors.append(f"{route}: store placeholder is an active link")
+        if re.search(r'store-badge-unavailable|Coming soon|Kommt bald|Próximamente|Google Play|coming-soon', source, re.IGNORECASE):
+            errors.append(f"{route}: contains an unpublished store placeholder")
         if "mailto:" in source or "support@getpadelly.com" in source:
             errors.append(f"{route}: email address is not source-obfuscated")
 

@@ -989,6 +989,42 @@ a.store-badge:hover {
   border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
+.app-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.app-icon-grid figure {
+  min-width: 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 680;
+  text-align: center;
+}
+
+.app-icon-grid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 19%;
+  box-shadow: var(--shadow-sm);
+}
+
+.app-icon-grid figcaption {
+  margin-top: 7px;
+  white-space: nowrap;
+}
+
+.section-note {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
 .privacy-callout {
   position: relative;
   overflow: hidden;

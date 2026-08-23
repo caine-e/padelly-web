@@ -2,7 +2,7 @@
   "source": {
     "repository": "https://github.com/caine-e/padelly.git",
     "ref": "origin/main",
-    "commit": "84a4a5486e914980dddc6a97381c2a84f6085f1b"
+    "commit": "d7c51ef576d06b694c7f772b0eddd14b56e61f3c"
   },
   "locales": {
     "en": {
@@ -35,6 +35,7 @@
         "match-setup",
         "live-score",
         "history",
+        "analytics",
         "fitness-icloud",
         "appearance-colors",
         "alternate-icons"
@@ -48,7 +49,7 @@
       "device": "Apple Watch Series 11 (46mm)",
       "runtime": "watchOS 26.5",
       "bundleId": "com.caine.Padelly.watchkitapp",
-      "scheme": "Padelly Watch App Watch App",
+      "scheme": "Padelly Watch App",
       "project": "ios/Padelly/Padelly.xcodeproj",
       "published": true,
       "scenes": [
