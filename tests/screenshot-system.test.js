@@ -9,6 +9,8 @@ const scenes = {
   "live-score": [480, 640, 720, 960],
   "match-setup": [480, 720],
   "settings-colors": [480, 720],
+  analytics: [480, 720],
+  "quick-start": [320, 416],
   "watch-point-score": [320, 416],
 };
 

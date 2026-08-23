@@ -44,7 +44,10 @@ HOME_SCREENSHOT_SCENES = [
     ("ios", "live-score", ["480", "720"]),
     ("ios", "analytics", ["480", "720"]),
 ]
-WATCH_SCREENSHOT_SCENES = [("watchos", "watch-point-score", ["320", "416"])]
+WATCH_SCREENSHOT_SCENES = [
+    ("watchos", "quick-start", ["320", "416"]),
+    ("watchos", "watch-point-score", ["320", "416"]),
+]
 SCREENSHOT_PROFILES = ("neon", "court", "ultra")
 TURNSTILE_SITE_KEY = "0x4AAAAAAD7gbCEDTdTNu6rM"
 TURNSTILE_ACTION = "turnstile-spin-v2"

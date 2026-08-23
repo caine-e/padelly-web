@@ -49,25 +49,51 @@
 
   function updateScreenshots() {
     document.querySelectorAll("[data-screenshot-scene][data-screenshot-platform]").forEach(function (image) {
+      guardScreenshot(image);
       updateScreenshot(image);
     });
   }
 
-  function updateScreenshot(image) {
-      const scene = image.dataset.screenshotScene;
+  function guardScreenshot(image) {
+    if (image.dataset.screenshotGuarded === "true") return;
+    image.dataset.screenshotGuarded = "true";
+    image.addEventListener("error", function () {
       const widths = (image.dataset.screenshotWidths || "")
         .split(",")
         .map(function (value) { return value.trim(); })
         .filter(Boolean);
+      if (widths.length && image.dataset.screenshotFallback !== "true") {
+        image.dataset.screenshotFallback = "true";
+        image.src = "/assets/screenshots/" + image.dataset.screenshotScene + "-ultra-" + widths[0] + ".webp";
+        image.srcset = widths.map(function (width) {
+          return "/assets/screenshots/" + image.dataset.screenshotScene + "-ultra-" + width + ".webp " + width + "w";
+        }).join(", ");
+        image.hidden = false;
+        image.removeAttribute("aria-hidden");
+        return;
+      }
+      image.hidden = true;
+      image.setAttribute("aria-hidden", "true");
+    });
+  }
 
-      if (!scene || !widths.length) return;
+  function updateScreenshot(image) {
+    const scene = image.dataset.screenshotScene;
+    const widths = (image.dataset.screenshotWidths || "")
+      .split(",")
+      .map(function (value) { return value.trim(); })
+      .filter(Boolean);
 
-      const base = screenshotBase(scene);
-      image.src = base + "-" + widths[0] + ".webp";
-      image.srcset = widths.map(function (width) {
-        return base + "-" + width + ".webp " + width + "w";
-      }).join(", ");
-      image.hidden = false;
+    if (!scene || !widths.length) return;
+
+    const base = screenshotBase(scene);
+    image.src = base + "-" + widths[0] + ".webp";
+    image.srcset = widths.map(function (width) {
+      return base + "-" + width + ".webp " + width + "w";
+    }).join(", ");
+    image.removeAttribute("data-screenshot-fallback");
+    image.hidden = false;
+    image.removeAttribute("aria-hidden");
   }
 
   function updateVisibleAppIcons() {
@@ -283,8 +309,8 @@
     const copy = {
       en: {
         previewLabel: "Inside Padelly",
-        tourTitle: "From first point to match point.",
-        tourCopy: "Seven real Padelly screens, in the same calm rhythm as a match takes shape.",
+        tourTitle: "Set up on iPhone. Score from your wrist.",
+        tourCopy: "The Apple Watch leads the live match. Keep the iPhone companion close for setup, history, and Analytics.",
         steps: [
           { label: "Quick Start", scene: "home", title: "Begin with the match you know.", copy: "Pick up a recent setup or start fresh from the Play screen.", alt: "Padelly home screen with Quick Start on iPhone" },
           { label: "Set up", scene: "match-setup", title: "Choose the shape of the match.", copy: "Select singles or doubles, the format, and who serves first before the first ball.", alt: "Padelly match setup screen on iPhone" },
@@ -309,11 +335,17 @@
         deviceTitle: "Set up on iPhone. Keep score from the wrist.",
         phoneTitle: "iPhone", phoneCopy: "Choose players, format, and first serving team, or score on the phone when no Watch is available.",
         watchTitle: "Apple Watch", watchCopy: "Use the large on-court controls to record the next point while serving information stays visible.",
+        watchViewerLabel: "Apple Watch first",
+        watchViewerEntry: "Entry screen",
+        watchViewerLive: "Live score",
+        watchViewerEntryAlt: "Padelly Apple Watch entry screen waiting for a match",
+        watchViewerLiveAlt: "Padelly live score controls on Apple Watch",
+        phoneViewerLabel: "iPhone companion",
       },
       de: {
         previewLabel: "In Padelly",
-        tourTitle: "Vom ersten Punkt zum Matchball.",
-        tourCopy: "Sieben echte Padelly-Screens, im ruhigen Rhythmus eines Matches.",
+        tourTitle: "Auf dem iPhone starten. Am Handgelenk zählen.",
+        tourCopy: "Die Apple Watch steht im Mittelpunkt des Live-Matches. Das iPhone bleibt für Einrichtung, Verlauf und Analytics dabei.",
         steps: [
           { label: "Schnellstart", scene: "home", title: "Mit dem vertrauten Match beginnen.", copy: "Eine letzte Konfiguration fortsetzen oder im Play-Bereich neu starten.", alt: "Padelly-Startbildschirm mit Schnellstart auf dem iPhone" },
           { label: "Einrichten", scene: "match-setup", title: "Die Form des Matches wählen.", copy: "Einzel oder Doppel, Format und erstes Aufschlagteam vor dem ersten Ball festlegen.", alt: "Padelly-Match-Einrichtung auf dem iPhone" },
@@ -338,11 +370,17 @@
         deviceTitle: "Auf dem iPhone einrichten. Am Handgelenk zählen.",
         phoneTitle: "iPhone", phoneCopy: "Spieler, Format und erstes Aufschlagteam wählen. Ohne Watch auch auf dem iPhone zählen.",
         watchTitle: "Apple Watch", watchCopy: "Die großen Bedienelemente am Court nutzen. Die Aufschlaginfo bleibt sichtbar.",
+        watchViewerLabel: "Apple Watch zuerst",
+        watchViewerEntry: "Startbildschirm",
+        watchViewerLive: "Live zählen",
+        watchViewerEntryAlt: "Padelly-Startbildschirm auf der Apple Watch, bereit für ein Match",
+        watchViewerLiveAlt: "Padelly-Live-Zähler auf der Apple Watch",
+        phoneViewerLabel: "iPhone-Begleiter",
       },
       es: {
         previewLabel: "Dentro de Padelly",
-        tourTitle: "Del primer punto al punto de partido.",
-        tourCopy: "Siete pantallas reales de Padelly, con el ritmo tranquilo con el que toma forma un partido.",
+        tourTitle: "Configura en iPhone. Cuenta desde la muñeca.",
+        tourCopy: "Apple Watch ocupa el centro del partido. El iPhone acompaña la configuración, el historial y Analytics.",
         steps: [
           { label: "Inicio rápido", scene: "home", title: "Empezar con el partido que conoces.", copy: "Retoma una configuración reciente o empieza de cero desde la pantalla Jugar.", alt: "Pantalla de inicio de Padelly con Inicio rápido en iPhone" },
           { label: "Configurar", scene: "match-setup", title: "Elegir la forma del partido.", copy: "Selecciona individual o dobles, el formato y quién saca primero antes de la primera bola.", alt: "Pantalla de configuración de partido de Padelly en iPhone" },
@@ -367,6 +405,12 @@
         deviceTitle: "Configura en iPhone. Cuenta desde la muñeca.",
         phoneTitle: "iPhone", phoneCopy: "Elige jugadores, formato y primer equipo al saque. Sin Watch, también puedes contar desde el teléfono.",
         watchTitle: "Apple Watch", watchCopy: "Usa los controles grandes en pista y mantén la información de saque visible.",
+        watchViewerLabel: "Apple Watch primero",
+        watchViewerEntry: "Pantalla de inicio",
+        watchViewerLive: "Marcador",
+        watchViewerEntryAlt: "Pantalla de inicio de Padelly en Apple Watch, lista para un partido",
+        watchViewerLiveAlt: "Controles de marcador de Padelly en Apple Watch",
+        phoneViewerLabel: "iPhone compañero",
       },
     };
 
@@ -384,10 +428,34 @@
     return "/assets/screenshots/" + scene + "-" + currentPreset;
   }
 
+  function screenshotDimensions(scene, platform) {
+    if (platform === "watchos") {
+      return { widths: [320, 416], width: 320, height: 382 };
+    }
+
+    if (scene === "home" || scene === "live-score") {
+      return { widths: [640, 960], width: 640, height: 1392 };
+    }
+
+    return { widths: [480, 720], width: 480, height: 1044 };
+  }
+
+  function setScreenshotSource(image, scene, platform) {
+    const dimensions = screenshotDimensions(scene, platform);
+    image.dataset.screenshotScene = scene;
+    image.dataset.screenshotPlatform = platform;
+    image.dataset.screenshotWidths = dimensions.widths.join(",");
+    image.width = dimensions.width;
+    image.height = dimensions.height;
+    guardScreenshot(image);
+    updateScreenshot(image);
+  }
+
   function createScreenshot(scene, locale, alt, options) {
     const settings = options || {};
     const platform = settings.platform || "ios";
-    const widths = settings.widths || (platform === "watchos" ? [320, 416] : scene === "home" ? [640, 960] : [480, 720]);
+    const dimensions = screenshotDimensions(scene, platform);
+    const widths = settings.widths || dimensions.widths;
     const image = document.createElement("img");
     const base = screenshotBase(scene);
 
@@ -399,10 +467,11 @@
     image.srcset = widths.map(function (width) { return base + "-" + width + ".webp " + width + "w"; }).join(", ");
     image.sizes = settings.sizes || "(max-width: 820px) 84vw, 420px";
     image.width = widths[0];
-    image.height = settings.height || (platform === "watchos" ? 382 : widths[0] === 640 ? 1392 : 1044);
+    image.height = settings.height || (widths[0] === dimensions.width ? dimensions.height : platform === "watchos" ? 382 : widths[0] === 640 ? 1392 : 1044);
     image.alt = alt;
     image.loading = settings.loading || "lazy";
     image.decoding = "async";
+    guardScreenshot(image);
     return image;
   }
 
@@ -428,6 +497,22 @@
     const layout = createElement("div", "product-tour-layout");
     const controls = createElement("div", "product-tour-controls");
     const visual = createElement("div", "product-tour-visual");
+    const devices = createElement("div", "product-tour-devices");
+    const watchDevice = createElement("div", "product-tour-device product-tour-device--watch");
+    const watchLabel = createElement("p", "product-tour-device-label", copy.watchViewerLabel);
+    const watchTabs = createElement("div", "product-tour-watch-tabs");
+    const watchEntryButton = createElement("button", "product-tour-watch-tab", copy.watchViewerEntry);
+    const watchLiveButton = createElement("button", "product-tour-watch-tab", copy.watchViewerLive);
+    const watchPanel = createElement("div", "product-tour-watch-panel");
+    const watchFrame = createElement("div", "product-tour-watch-frame");
+    const watchImage = createScreenshot("quick-start", locale, copy.watchViewerEntryAlt, {
+      platform: "watchos",
+      className: "product-tour-watch-shot",
+      loading: "eager",
+      sizes: "(max-width: 680px) 50vw, 190px",
+    });
+    const phoneDevice = createElement("div", "product-tour-device product-tour-device--phone");
+    const phoneLabel = createElement("p", "product-tour-device-label", copy.phoneViewerLabel);
     const frame = createElement("div", "product-tour-phone");
     const screen = createElement("div", "product-tour-screen");
     const detail = createElement("div", "product-tour-detail");
@@ -440,6 +525,7 @@
       sizes: "(max-width: 680px) 74vw, (max-width: 1040px) 42vw, 420px",
     });
     const buttons = [];
+    const watchButtons = [watchEntryButton, watchLiveButton];
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let activeIndex = 0;
     let touchStartX = null;
@@ -452,8 +538,55 @@
     tabList.setAttribute("aria-label", copy.previewLabel);
     screen.id = "product-tour-panel";
     screen.setAttribute("role", "tabpanel");
+    watchTabs.setAttribute("role", "tablist");
+    watchTabs.setAttribute("aria-label", copy.watchViewerLabel);
+    watchPanel.id = "product-tour-watch-panel";
+    watchPanel.setAttribute("role", "tabpanel");
+    watchEntryButton.type = "button";
+    watchLiveButton.type = "button";
+    watchEntryButton.id = "product-tour-watch-entry";
+    watchLiveButton.id = "product-tour-watch-live";
+    watchButtons.forEach(function (button) {
+      button.setAttribute("role", "tab");
+      button.setAttribute("aria-controls", watchPanel.id);
+      button.tabIndex = -1;
+    });
     detail.setAttribute("aria-live", "polite");
     detail.setAttribute("aria-atomic", "true");
+
+    function setWatchScene(scene, alt, selectedButton) {
+      watchButtons.forEach(function (button) {
+        const isSelected = button === selectedButton;
+        button.setAttribute("aria-selected", isSelected ? "true" : "false");
+        button.tabIndex = isSelected ? 0 : -1;
+      });
+      watchPanel.setAttribute("aria-labelledby", selectedButton.id);
+      watchImage.alt = alt;
+      setScreenshotSource(watchImage, scene, "watchos");
+    }
+
+    watchEntryButton.addEventListener("click", function () {
+      setWatchScene("quick-start", copy.watchViewerEntryAlt, watchEntryButton);
+    });
+    watchLiveButton.addEventListener("click", function () {
+      setWatchScene("watch-point-score", copy.watchViewerLiveAlt, watchLiveButton);
+    });
+    watchTabs.addEventListener("keydown", function (event) {
+      const currentIndex = watchButtons.indexOf(document.activeElement);
+      if (currentIndex === -1) return;
+
+      let nextIndex = null;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (currentIndex + 1) % watchButtons.length;
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (currentIndex - 1 + watchButtons.length) % watchButtons.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = watchButtons.length - 1;
+      if (nextIndex === null) return;
+
+      event.preventDefault();
+      const nextButton = watchButtons[nextIndex];
+      nextButton.click();
+      nextButton.focus();
+    });
 
     copy.steps.forEach(function (step, index) {
       const button = createElement("button", "product-tour-tab", step.label);
@@ -477,9 +610,8 @@
         button.tabIndex = isSelected ? 0 : -1;
       });
       screen.setAttribute("aria-labelledby", buttons[activeIndex].id);
-      image.dataset.screenshotScene = step.scene;
       image.alt = step.alt;
-      updateScreenshot(image);
+      setScreenshotSource(image, step.scene, "ios");
       stepCount.textContent = (activeIndex + 1) + " / " + copy.steps.length;
       detailTitle.textContent = step.title;
       detailCopy.textContent = step.copy;
@@ -542,15 +674,22 @@
     });
 
     intro.append(label, title, description);
+    watchTabs.append(watchEntryButton, watchLiveButton);
+    watchPanel.append(watchImage);
+    watchFrame.append(watchPanel);
+    watchDevice.append(watchLabel, watchTabs, watchFrame);
     screen.append(image);
     frame.append(screen);
-    visual.append(frame);
+    phoneDevice.append(phoneLabel, frame);
+    devices.append(watchDevice, phoneDevice);
+    visual.append(devices);
     detail.append(stepCount, detailTitle, detailCopy);
     controls.append(detail);
     layout.append(controls, visual);
     stage.append(tabList, layout);
     section.append(intro, stage);
     hero.insertAdjacentElement("afterend", section);
+    setWatchScene("quick-start", copy.watchViewerEntryAlt, watchEntryButton);
     selectStep(0, false);
   }
 
@@ -679,8 +818,6 @@
 
     mountProductTour(main, copy, locale);
     mountFormatExplorer(main, copy, locale);
-    // Re-enable when dedicated iPhone and Apple Watch comparison captures are available.
-    // mountDeviceComparison(main, copy, locale);
     mountJourneyProgress();
   }
 

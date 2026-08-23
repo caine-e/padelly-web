@@ -1377,6 +1377,19 @@ a.store-badge:hover {
   justify-self: center;
 }
 
+.watch-entry-showcase {
+  padding-top: clamp(88px, 10vw, 142px);
+}
+
+.watch-entry-showcase .editorial-visual {
+  width: min(100%, 380px);
+}
+
+.watch-entry-showcase .watch-screen-frame {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line-strong));
+  box-shadow: 0 30px 70px rgba(9, 12, 17, 0.2), 0 0 70px rgba(var(--accent-rgb), 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
 .step-list {
   counter-reset: steps;
   display: grid;
@@ -2836,6 +2849,107 @@ a.store-badge:hover {
   position: relative;
   justify-self: center;
   width: min(100%, 390px);
+}
+
+.product-tour-devices {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(9px, 1.8vw, 17px);
+  width: 100%;
+}
+
+.product-tour-device {
+  min-width: 0;
+}
+
+.product-tour-device--watch {
+  width: 55%;
+}
+
+.product-tour-device--phone {
+  width: 45%;
+}
+
+.product-tour-device-label {
+  margin: 0 0 8px;
+  color: var(--muted-strong);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.product-tour-device--watch .product-tour-device-label {
+  color: var(--accent-ink);
+}
+
+.product-tour-watch-tabs {
+  display: flex;
+  gap: 3px;
+  margin: 0 0 8px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--glass-solid) 82%, transparent);
+}
+
+.product-tour-watch-tab {
+  min-width: 0;
+  flex: 1 1 0;
+  padding: 6px 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 760;
+  line-height: 1.1;
+  white-space: normal;
+}
+
+.product-tour-watch-tab:hover {
+  color: var(--text);
+}
+
+.product-tour-watch-tab:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 68%, transparent);
+  outline-offset: 1px;
+}
+
+.product-tour-watch-tab[aria-selected="true"] {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.product-tour-watch-frame {
+  overflow: hidden;
+  padding: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 31%;
+  background: #090b0e;
+  box-shadow: 0 25px 48px rgba(0, 0, 0, 0.23), 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.product-tour-watch-panel {
+  overflow: hidden;
+  border-radius: 25%;
+  background: #090b0e;
+}
+
+.product-tour-watch-shot {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 25%;
+}
+
+.product-tour-device--phone .product-tour-phone {
+  width: 100%;
 }
 
 .product-tour-visual::before {
