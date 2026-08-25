@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/assets/*",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/llms.txt",
+    "/*.css",
+    "/*.ico",
+    "/*.jpg",
+    "/*.jpeg",
+    "/*.js",
+    "/*.json",
+    "/*.png",
+    "/*.svg",
+    "/*.txt",
+    "/*.webp",
+    "/*.xml"
+  ]
+}

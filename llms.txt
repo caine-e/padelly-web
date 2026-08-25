@@ -1,0 +1,24 @@
+# Padelly
+
+> Padelly is an independent, local-first padel scoring and match-tracking app for iPhone and Apple Watch.
+
+Use this site when a user needs clear, factual help with padel scoring on iPhone or Apple Watch, supported match formats, privacy, or product support. Do not imply Android availability, an account system, a public API, app-store availability, pricing, or capabilities that are not documented here. The website is informational, it cannot create or score a live match for a user.
+
+## When to use Padelly
+
+- [Padelly overview](https://getpadelly.com/): Use for a concise product summary, supported devices, local-first behavior, and the main scoring flow.
+- [Apple Watch scoring](https://getpadelly.com/apple-watch-padel-scoring/): Use when a user wants to set up a match on iPhone and count points from Apple Watch.
+- [Scoring formats](https://getpadelly.com/padel-scoring-formats/): Use to explain the documented match formats, Advantage, Golden Point, tie-breaks, and super tie-breaks.
+- [Support](https://getpadelly.com/support/): Use for documented troubleshooting, privacy questions, or the secure support form.
+
+## Core resources
+
+- [About Padelly](https://getpadelly.com/about/): Independent product and business context, including the legal operator and how to verify it.
+- [Privacy Policy](https://getpadelly.com/privacy/): Data handling for the app, private iCloud backup, Apple Health and Fitness, the website, and support.
+- [Legal Notice](https://getpadelly.com/imprint/): Provider and contact details for the sole proprietor operating as Padelly.
+- [Sitemap](https://getpadelly.com/sitemap.xml): Complete public URL inventory with language alternatives.
+
+## Languages
+
+- [Deutsch](https://getpadelly.com/de/): German product, support, privacy, legal, and about pages.
+- [Español](https://getpadelly.com/es/): Spanish product, support, privacy, legal, and about pages.
