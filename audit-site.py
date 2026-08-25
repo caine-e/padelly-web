@@ -20,6 +20,7 @@ DEDICATION = "♥ Built with love by AI and dedicated to Katja, who is way out o
 
 GROUPS = [
     ("/", "/de/", "/es/"),
+    ("/about/", "/de/ueber-padelly/", "/es/sobre-padelly/"),
     ("/privacy/", "/de/privacy/", "/es/privacy/"),
     ("/support/", "/de/support/", "/es/support/"),
     ("/apple-watch-padel-scoring/", "/de/padel-zaehlen-mit-apple-watch/", "/es/marcador-de-padel-en-apple-watch/"),
@@ -28,6 +29,7 @@ GROUPS = [
 ]
 
 LEGAL_ROUTES = {"/imprint/", "/de/impressum/", "/es/aviso-legal/"}
+ABOUT_ROUTES = {"/about/", "/de/ueber-padelly/", "/es/sobre-padelly/"}
 PRIVACY_ROUTES = {"/privacy/", "/de/privacy/", "/es/privacy/"}
 SUPPORT_ROUTES = {"/support/", "/de/support/", "/es/support/"}
 HOME_SCREENSHOT_ROUTES = {"/", "/de/", "/es/"}
@@ -194,6 +196,8 @@ def main() -> int:
             errors.append(f"{route}: expected one title, found {parser.title_count}")
         if parser.h1_count != 1:
             errors.append(f"{route}: expected one H1, found {parser.h1_count}")
+        if route in ABOUT_ROUTES and len(visible) < 500:
+            errors.append(f"{route}: about page needs at least 500 visible characters")
         titles[route] = title
 
         desc_values = [m.get("content", "") for m in parser.metas if m.get("name") == "description"]
@@ -387,6 +391,25 @@ def main() -> int:
             if route in {"/", "/de/", "/es/"}:
                 if not {"Organization", "WebSite", "MobileApplication"}.issubset(types):
                     errors.append(f"{route}: landing schema graph is incomplete")
+                if route == "/":
+                    organizations = [obj for obj in objects if obj.get("@type") == "Organization"]
+                    if len(organizations) != 1:
+                        errors.append("/: expected one Organization schema object")
+                    else:
+                        organization = organizations[0]
+                        for key in ["name", "description", "url", "logo", "address", "contactPoint"]:
+                            if not organization.get(key):
+                                errors.append(f"/: Organization schema is missing {key}")
+                        address = organization.get("address", {})
+                        if address.get("@type") != "PostalAddress" or not {"streetAddress", "postalCode", "addressLocality", "addressCountry"}.issubset(address):
+                            errors.append("/: Organization schema address is incomplete")
+                        contact_points = organization.get("contactPoint", [])
+                        if not isinstance(contact_points, list) or not contact_points:
+                            errors.append("/: Organization schema needs a contact point")
+                        else:
+                            contact_point = contact_points[0]
+                            if contact_point.get("@type") != "ContactPoint" or not {"contactType", "email", "url"}.issubset(contact_point):
+                                errors.append("/: Organization schema contact point is incomplete")
             else:
                 if not {"WebPage", "BreadcrumbList"}.issubset(types):
                     errors.append(f"{route}: supporting-page schema is incomplete")
@@ -442,7 +465,7 @@ def main() -> int:
             errors.append("Sitemap URLs do not exactly match page canonicals")
         for canonical, element in sitemap_urls.items():
             route = urlparse(canonical).path
-            expected_lastmod = "2026-07-22" if route in PRIVACY_ROUTES | SUPPORT_ROUTES else "2026-07-18"
+            expected_lastmod = "2026-08-26" if route in ABOUT_ROUTES else "2026-07-22" if route in PRIVACY_ROUTES | SUPPORT_ROUTES else "2026-07-18"
             if element.findtext("s:lastmod", default="", namespaces=ns) != expected_lastmod:
                 errors.append(f"{route}: incorrect sitemap lastmod")
             alternates = {link.get("hreflang", ""): link.get("href", "") for link in element.findall("x:link", ns)}
@@ -460,6 +483,32 @@ def main() -> int:
         errors.append("CNAME must not exist yet")
     if not (ROOT / "assets/social/padelly-social-1200x630.jpg").is_file():
         errors.append("Social preview image is missing")
+
+    llms_path = ROOT / "llms.txt"
+    llms = llms_path.read_text(encoding="utf-8") if llms_path.is_file() else ""
+    if not llms.startswith("# Padelly\n\n>"):
+        errors.append("llms.txt must start with its H1 and blockquote summary")
+    if "## When to use Padelly\n\n- [Padelly overview]" not in llms:
+        errors.append("llms.txt is missing specific when-to-use guidance")
+    for url in ["https://getpadelly.com/about/", "https://getpadelly.com/support/", "https://getpadelly.com/privacy/", "https://getpadelly.com/sitemap.xml"]:
+        if url not in llms:
+            errors.append(f"llms.txt is missing {url}")
+
+    not_found_path = ROOT / "404.html"
+    not_found = not_found_path.read_text(encoding="utf-8") if not_found_path.is_file() else ""
+    if not all(value in not_found for value in ["Page not found", 'href="/llms.txt"', 'href="/sitemap.xml"']):
+        errors.append("404.html must direct agents to llms.txt and sitemap.xml")
+
+    routes_path = ROOT / "_routes.json"
+    try:
+        routes = json.loads(routes_path.read_text(encoding="utf-8"))
+        if routes.get("version") != 1 or routes.get("include") != ["/*"]:
+            errors.append("_routes.json must route document requests through the middleware")
+        required_exclusions = {"/assets/*", "/llms.txt", "/robots.txt", "/sitemap.xml"}
+        if not required_exclusions.issubset(routes.get("exclude", [])):
+            errors.append("_routes.json must exclude static assets and machine-readable files")
+    except (json.JSONDecodeError, OSError) as exc:
+        errors.append(f"_routes.json is invalid: {exc}")
 
     source_files = [
         path for path in ROOT.rglob("*")
@@ -485,6 +534,7 @@ def main() -> int:
     print("- valid JSON-LD with visible support FAQs")
     print("- internal links, language pickers, scripts, images, sitemap, and robots")
     print("- localized support forms, honeypots, Turnstile markers, and privacy links")
+    print("- localized about pages, agent instructions, and machine-readable route assets")
     print("- exact dedication, legal links, legal-only email display, indexed sitemap, and legal noindex policy")
     print("- no href=\"#\", active store placeholder, or CNAME")
     return 0

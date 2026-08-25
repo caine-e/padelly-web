@@ -13,6 +13,18 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://getpadelly.com/"/><xhtml:link rel="alternate" hreflang="de" href="https://getpadelly.com/de/"/><xhtml:link rel="alternate" hreflang="es" href="https://getpadelly.com/es/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://getpadelly.com/"/>
   </url>
   <url>
+    <loc>https://getpadelly.com/about/</loc><lastmod>2026-08-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://getpadelly.com/about/"/><xhtml:link rel="alternate" hreflang="de" href="https://getpadelly.com/de/ueber-padelly/"/><xhtml:link rel="alternate" hreflang="es" href="https://getpadelly.com/es/sobre-padelly/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://getpadelly.com/about/"/>
+  </url>
+  <url>
+    <loc>https://getpadelly.com/de/ueber-padelly/</loc><lastmod>2026-08-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://getpadelly.com/about/"/><xhtml:link rel="alternate" hreflang="de" href="https://getpadelly.com/de/ueber-padelly/"/><xhtml:link rel="alternate" hreflang="es" href="https://getpadelly.com/es/sobre-padelly/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://getpadelly.com/about/"/>
+  </url>
+  <url>
+    <loc>https://getpadelly.com/es/sobre-padelly/</loc><lastmod>2026-08-26</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://getpadelly.com/about/"/><xhtml:link rel="alternate" hreflang="de" href="https://getpadelly.com/de/ueber-padelly/"/><xhtml:link rel="alternate" hreflang="es" href="https://getpadelly.com/es/sobre-padelly/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://getpadelly.com/about/"/>
+  </url>
+  <url>
     <loc>https://getpadelly.com/privacy/</loc><lastmod>2026-07-22</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://getpadelly.com/privacy/"/><xhtml:link rel="alternate" hreflang="de" href="https://getpadelly.com/de/privacy/"/><xhtml:link rel="alternate" hreflang="es" href="https://getpadelly.com/es/privacy/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://getpadelly.com/privacy/"/>
   </url>
