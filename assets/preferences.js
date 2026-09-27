@@ -15,13 +15,9 @@
   root.dataset.appearance = preference(
     "padelly-appearance",
     ["system", "light", "dark"],
-    "system"
+    "light"
   );
-  root.dataset.preset = preference(
-    "padelly-color-preset",
-    ["neon", "court", "ultra"],
-    "ultra"
-  );
+  root.dataset.preset = "ultra";
 
   function savedLanguage() {
     try {

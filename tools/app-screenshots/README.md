@@ -35,3 +35,12 @@ The website uses only `en`, `de`, and `es` plus `light` and `dark`. Its
 `system` appearance resolves to one of those two image variants at runtime.
 watchOS uses its native dark interface, so the Watch light and dark assets are
 separate files with the same system appearance.
+
+The September 2026 refresh was captured from app commit
+`4831e8d2b198cbf71373ff9c2667ef2facaada11` in a disposable checkout.
+The iPhone Play, History, and Analytics screens use five synthetic completed
+matches with the names in `manifest.json`. Match setup and live scoring are
+fresh simulator captures. The Watch quick-start and score screens use a
+capture-only Debug fixture with one synthetic planned match and Fitness off,
+so no Health permission or personal data appears. The fixture was added only
+to the temporary checkout, not the app repository.

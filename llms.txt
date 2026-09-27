@@ -7,8 +7,8 @@ Use this site when a user needs clear, factual help with padel scoring on iPhone
 ## When to use Padelly
 
 - [Padelly overview](https://getpadelly.com/): Use for a concise product summary, supported devices, local-first behavior, and the main scoring flow.
-- [Apple Watch scoring](https://getpadelly.com/apple-watch-padel-scoring/): Use when a user wants to set up a match on iPhone and count points from Apple Watch.
-- [Scoring formats](https://getpadelly.com/padel-scoring-formats/): Use to explain the documented match formats, Advantage, Golden Point, tie-breaks, and super tie-breaks.
+- [Apple Watch scoring](https://getpadelly.com/apple-watch-padel-scoring/): Use when a user wants to start a match on Watch or continue a plan from iPhone and count points from the wrist.
+- [Scoring formats](https://getpadelly.com/padel-scoring-formats/): Use to explain the current match rule choices, including Advantage, Golden Point, Star Point, set structure, and tie-breaks.
 - [Support](https://getpadelly.com/support/): Use for documented troubleshooting, privacy questions, or the secure support form.
 
 ## Core resources
