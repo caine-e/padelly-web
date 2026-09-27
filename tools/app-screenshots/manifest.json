@@ -2,7 +2,7 @@
   "source": {
     "repository": "https://github.com/caine-e/padelly.git",
     "ref": "origin/main",
-    "commit": "d7c51ef576d06b694c7f772b0eddd14b56e61f3c"
+    "commit": "4831e8d2b198cbf71373ff9c2667ef2facaada11"
   },
   "locales": {
     "en": {
@@ -35,10 +35,7 @@
         "match-setup",
         "live-score",
         "history",
-        "analytics",
-        "fitness-icloud",
-        "appearance-colors",
-        "alternate-icons"
+        "analytics"
       ],
       "widths": [
         640,
@@ -92,6 +89,8 @@
       "Sam",
       "Jordan",
       "Taylor"
-    ]
+    ],
+    "note": "Five completed matches captured in a disposable iPhone simulator; no personal or production data.",
+    "watch": "One planned doubles match with Jordan, Taylor, Alex, and Sam; Fitness off in a capture-only Debug fixture."
   }
 }

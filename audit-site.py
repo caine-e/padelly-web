@@ -40,17 +40,16 @@ WATCH_SCREENSHOT_ROUTES = {
 }
 HOME_SCREENSHOT_SCENES = [
     ("ios", "home", ["640", "960"]),
-    ("ios", "history", ["480", "720"]),
-    ("ios", "settings-colors", ["480", "720"]),
-    ("ios", "settings-colors", ["480", "720"]),
-    ("ios", "live-score", ["480", "720"]),
-    ("ios", "analytics", ["480", "720"]),
+    ("watchos", "live-score", ["416"]),
+    ("ios", "match-setup", ["640", "960"]),
+    ("watchos", "live-score", ["416"]),
+    ("ios", "analytics", ["640", "960"]),
 ]
 WATCH_SCREENSHOT_SCENES = [
-    ("watchos", "quick-start", ["320", "416"]),
-    ("watchos", "watch-point-score", ["320", "416"]),
+    ("watchos", "quick-start", ["416"]),
+    ("watchos", "live-score", ["416"]),
 ]
-SCREENSHOT_PROFILES = ("neon", "court", "ultra")
+SCREENSHOT_APPEARANCES = ("light", "dark")
 TURNSTILE_SITE_KEY = "0x4AAAAAAD7gbCEDTdTNu6rM"
 TURNSTILE_ACTION = "turnstile-spin-v2"
 TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js"
@@ -274,12 +273,21 @@ def main() -> int:
         if actual_screenshots != expected_screenshots:
             errors.append(f"{route}: managed screenshot contract mismatch: {actual_screenshots}")
 
-        for _platform, scene, widths in expected_screenshots:
-            for profile in SCREENSHOT_PROFILES:
+        locale = "de" if route.startswith("/de/") else "es" if route.startswith("/es/") else "en"
+        for (platform, scene, widths), image in zip(expected_screenshots, managed_screenshots):
+            expected_source = f"/assets/screenshots/{platform}/{scene}-{locale}-light-{widths[0]}.webp?v=20260927c"
+            if image.get("src") != expected_source:
+                errors.append(f"{route}: screenshot source is not localized: {image.get('src')}")
+            for appearance in SCREENSHOT_APPEARANCES:
                 for width in widths:
-                    asset = ROOT / "assets" / "screenshots" / f"{scene}-{profile}-{width}.webp"
+                    asset = ROOT / "assets" / "screenshots" / platform / f"{scene}-{locale}-{appearance}-{width}.webp"
                     if not asset.is_file() or asset.stat().st_size == 0:
                         errors.append(f"{route}: missing screenshot asset {asset.relative_to(ROOT)}")
+
+        appearance_pickers = [item for item in parser.divs if item.get("data-picker") == "appearance"]
+        language_pickers = [item for item in parser.divs if item.get("data-picker") == "language"]
+        if len(appearance_pickers) != 1 or len(language_pickers) != 1 or 'data-picker="preset"' in source:
+            errors.append(f"{route}: appearance or language picker is missing or obsolete")
 
         email_displays = source.count('class="email-address"')
         if route in LEGAL_ROUTES | PRIVACY_ROUTES:
@@ -465,7 +473,8 @@ def main() -> int:
             errors.append("Sitemap URLs do not exactly match page canonicals")
         for canonical, element in sitemap_urls.items():
             route = urlparse(canonical).path
-            expected_lastmod = "2026-08-26" if route in ABOUT_ROUTES else "2026-07-22" if route in PRIVACY_ROUTES | SUPPORT_ROUTES else "2026-07-18"
+            refreshed_routes = HOME_SCREENSHOT_ROUTES | WATCH_SCREENSHOT_ROUTES | SUPPORT_ROUTES | PRIVACY_ROUTES | {"/padel-scoring-formats/", "/de/padel-zaehlweisen/", "/es/formatos-de-puntuacion-de-padel/"}
+            expected_lastmod = "2026-09-27" if route in refreshed_routes else "2026-08-26" if route in ABOUT_ROUTES else "2026-07-22"
             if element.findtext("s:lastmod", default="", namespaces=ns) != expected_lastmod:
                 errors.append(f"{route}: incorrect sitemap lastmod")
             alternates = {link.get("hreflang", ""): link.get("href", "") for link in element.findall("x:link", ns)}

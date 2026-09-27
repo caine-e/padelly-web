@@ -2,57 +2,53 @@ import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
-const profiles = ["neon", "court", "ultra"];
-const scenes = {
-  home: [640, 960],
-  history: [480, 720],
-  "live-score": [480, 640, 720, 960],
-  "match-setup": [480, 720],
-  "settings-colors": [480, 720],
-  analytics: [480, 720],
-  "quick-start": [320, 416],
-  "watch-point-score": [320, 416],
-};
+const manifest = JSON.parse(await readFile(new URL("../tools/app-screenshots/manifest.json", import.meta.url), "utf8"));
 
-test("every published scene has responsive assets for all color profiles", async () => {
-  for (const [scene, widths] of Object.entries(scenes)) {
-    for (const profile of profiles) {
-      for (const width of widths) {
-        const asset = new URL(`../assets/screenshots/${scene}-${profile}-${width}.webp`, import.meta.url);
-        const details = await stat(asset);
-        assert.ok(details.size > 0, `${scene}-${profile}-${width}.webp is empty`);
+test("every published Apple scene has localized light and dark assets", async () => {
+  for (const platform of ["ios", "watchos"]) {
+    const { scenes, widths } = manifest.platforms[platform];
+    for (const scene of scenes) {
+      for (const locale of Object.keys(manifest.locales)) {
+        for (const appearance of manifest.appearances) {
+          for (const width of widths) {
+            const name = `${scene}-${locale}-${appearance}-${width}.webp`;
+            const asset = new URL(`../assets/screenshots/${platform}/${name}`, import.meta.url);
+            const details = await stat(asset);
+            assert.ok(details.size > 0, `${platform}/${name} is empty`);
+          }
+        }
       }
     }
   }
 });
 
-test("managed screenshots defer loading and provide Ultra Court no-script fallbacks", async () => {
-  const pages = [
-    "../index.html",
-    "../de/index.html",
-    "../es/index.html",
-    "../apple-watch-padel-scoring/index.html",
-    "../de/padel-zaehlen-mit-apple-watch/index.html",
-    "../es/marcador-de-padel-en-apple-watch/index.html",
+test("homepage and Watch guide render locale-matched screenshots without JavaScript", async () => {
+  const routes = [
+    ["../index.html", "en"],
+    ["../de/index.html", "de"],
+    ["../es/index.html", "es"],
+    ["../apple-watch-padel-scoring/index.html", "en"],
+    ["../de/padel-zaehlen-mit-apple-watch/index.html", "de"],
+    ["../es/marcador-de-padel-en-apple-watch/index.html", "es"],
   ];
 
-  for (const page of pages) {
-    const source = await readFile(new URL(page, import.meta.url), "utf8");
-    const managedImages = source.match(/<img [^>]*data-screenshot-scene=[^>]*>/g) || [];
-    assert.ok(managedImages.length > 0, `${page} has no managed screenshots`);
-    for (const image of managedImages) {
-      assert.match(image, /^<img hidden /);
-      assert.doesNotMatch(image, /\ssrc=/);
-      assert.doesNotMatch(image, /\ssrcset=/);
+  for (const [route, locale] of routes) {
+    const source = await readFile(new URL(route, import.meta.url), "utf8");
+    const images = source.match(/<img [^>]*data-screenshot-scene=[^>]*>/g) || [];
+    assert.ok(images.length > 0, `${route} has no managed screenshots`);
+    for (const image of images) {
+      assert.match(image, new RegExp(`src="/assets/screenshots/(ios|watchos)/[^"]+-${locale}-light-\\d+\\.webp\\?v=20260927c"`));
       assert.match(image, /width="\d+" height="\d+"/);
+      assert.doesNotMatch(image, /<img hidden /);
     }
-    assert.match(source, /<noscript><img src="\/assets\/screenshots\/[^"]+-ultra-\d+\.webp" srcset="[^"]+ \d+w, [^"]+ \d+w"/);
   }
 });
 
-test("the preset picker updates screenshot URLs immediately", async () => {
+test("appearance and language choices update the current screenshot matrix", async () => {
   const source = await readFile(new URL("../assets/site.js", import.meta.url), "utf8");
-  assert.match(source, /function screenshotBase\(scene\)[\s\S]*scene \+ "-" \+ currentPreset/);
-  assert.match(source, /type === "preset"[\s\S]*savePreference\(presetKey, currentPreset\);[\s\S]*updateScreenshots\(\);/);
-  assert.doesNotMatch(source, /screenshots\/" \+ platform/);
+  assert.match(source, /function effectiveAppearance\(\)/);
+  assert.match(source, /function screenshotPath\(image, language, appearance, width\)/);
+  assert.match(source, /setScreenshot\(image, locale\(\), effectiveAppearance\(\)\)/);
+  assert.match(source, /darkQuery\.addEventListener\("change"/);
+  assert.doesNotMatch(source, /currentPreset|presetKey|screenshotBase/);
 });
