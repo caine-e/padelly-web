@@ -14,7 +14,7 @@ Use this site when a user needs clear, factual help with padel scoring on iPhone
 ## Core resources
 
 - [About Padelly](https://getpadelly.com/about/): Independent product and business context, including the legal operator and how to verify it.
-- [Privacy Policy](https://getpadelly.com/privacy/): Data handling for the app, private iCloud backup, Apple Health and Fitness, the website, and support.
+- [Privacy Policy](https://getpadelly.com/privacy/): Data handling for the app, private iCloud backup, Apple Health and Fitness, the website (including cookieless audience measurement with Umami), and support. The app itself contains no analytics.
 - [Legal Notice](https://getpadelly.com/imprint/): Provider and contact details for the sole proprietor operating as Padelly.
 - [Sitemap](https://getpadelly.com/sitemap.xml): Complete public URL inventory with language alternatives.
 
