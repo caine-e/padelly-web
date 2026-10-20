@@ -24,3 +24,5 @@ cp -R \
   de \
   es \
   "$output_dir/"
+
+python3 tools/build/strip-html-comments.py "$output_dir"

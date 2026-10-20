@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Learn how Padelly tracks padel points on Apple Watch with large controls, serving guidance, cross-boundary undo, offline continuity, and iPhone fallback.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-  <meta name="theme-color" id="theme-color" content="#f5f6f4">
+  <meta name="theme-color" id="theme-color" content="#f5f4ee">
   <title>Apple Watch Padel Scoring App: Padelly</title>
   <link rel="canonical" href="https://getpadelly.com/apple-watch-padel-scoring/">
   <link rel="alternate" hreflang="en" href="https://getpadelly.com/apple-watch-padel-scoring/">
@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Apple Watch Padel Scoring App: Padelly"><meta name="twitter:description" content="Start on Apple Watch or plan on iPhone, then score from your wrist with serving guidance and undo."><meta name="twitter:image" content="https://getpadelly.com/assets/social/padelly-social-1200x630.jpg?v=20260927"><meta name="twitter:image:alt" content="Padelly Play dashboard on iPhone and live score on Apple Watch">
   <link rel="icon" href="../assets/icons/favicon-64.png" type="image/png"><link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
   <script src="../assets/preferences.js?v=20260927"></script><link rel="stylesheet" href="../assets/styles.css?v=1c282e8">
-  <link rel="stylesheet" href="/assets/redesign.css?v=20260927b"><script src="../assets/site.js?v=20260927c" defer></script>
+  <link rel="stylesheet" href="/assets/redesign.css?v=20260927b"><script src="../assets/site.js?v=20261020d" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -48,12 +48,14 @@
     ]
   }
   </script>
+  <link rel="stylesheet" href="/assets/sport.css?v=20261020d">
 </head>
-<body>
+<body class="sport-site">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header"><div class="header-bar">
     <a class="brand" href="../" aria-label="Padelly home"><img class="brand-icon" src="../assets/icons/classic-white-96.webp" width="96" height="96" alt=""><span>Padelly</span></a>
-    <nav class="header-nav" aria-label="Main navigation"><a href="../">Home</a><a href="./" aria-current="page">Watch scoring</a><a href="../padel-scoring-formats/">Scoring formats</a><a href="../privacy/">Privacy</a><a href="../support/">Support</a></nav>
+    <button class="sport-menu-trigger" type="button" aria-expanded="false" aria-controls="primary-navigation" data-nav-toggle aria-label="Menu"><span>Menu</span><i aria-hidden="true"></i></button>
+      <nav id="primary-navigation" class="header-nav" aria-label="Main navigation"><a href="../">Home</a><a href="./" aria-current="page">Watch scoring</a><a href="../padel-scoring-formats/">Scoring formats</a><a href="../privacy/">Privacy</a><a href="../support/">Support</a></nav>
     <div class="global-controls" aria-label="Site preferences">
         <div class="picker" data-picker="appearance" data-label="Appearance"><button class="picker-trigger" type="button" data-picker-trigger aria-label="Appearance: System" aria-haspopup="menu" aria-expanded="false" aria-controls="appearance-menu"><span class="control-icon" aria-hidden="true">◐</span><span class="control-value" data-picker-value>System</span><span class="control-chevron" aria-hidden="true">⌄</span></button><div class="picker-menu" id="appearance-menu" data-picker-menu role="menu" aria-label="Appearance" hidden><button class="picker-option" type="button" role="menuitemradio" aria-checked="true" data-value="system"><span class="option-main"><span class="option-symbol" aria-hidden="true">◐</span><span class="option-label">System</span></span><span class="option-check" aria-hidden="true">✓</span></button><button class="picker-option" type="button" role="menuitemradio" aria-checked="false" data-value="light"><span class="option-main"><span class="option-symbol" aria-hidden="true">☀</span><span class="option-label">Light</span></span><span class="option-check" aria-hidden="true">✓</span></button><button class="picker-option" type="button" role="menuitemradio" aria-checked="false" data-value="dark"><span class="option-main"><span class="option-symbol" aria-hidden="true">●</span><span class="option-label">Dark</span></span><span class="option-check" aria-hidden="true">✓</span></button></div></div>
         <div class="picker" data-picker="language" data-label="Language"><button class="picker-trigger" type="button" data-picker-trigger aria-label="Language: English" aria-haspopup="menu" aria-expanded="false" aria-controls="language-menu"><span class="control-flag" data-current-flag aria-hidden="true">🇬🇧</span><span class="control-value" data-picker-value>English</span><span class="control-chevron" aria-hidden="true">⌄</span></button><div class="picker-menu" id="language-menu" data-picker-menu role="menu" aria-label="Language" hidden><a class="picker-option" href="/apple-watch-padel-scoring/" lang="en" role="menuitemradio" aria-checked="true" data-value="en" data-flag="🇬🇧"><span class="option-main"><span class="option-flag" aria-hidden="true">🇬🇧</span><span class="option-label">English</span></span><span class="option-check" aria-hidden="true">✓</span></a><a class="picker-option" href="/de/padel-zaehlen-mit-apple-watch/" lang="de" role="menuitemradio" aria-checked="false" data-value="de" data-flag="🇩🇪"><span class="option-main"><span class="option-flag" aria-hidden="true">🇩🇪</span><span class="option-label">Deutsch</span></span><span class="option-check" aria-hidden="true">✓</span></a><a class="picker-option" href="/es/marcador-de-padel-en-apple-watch/" lang="es" role="menuitemradio" aria-checked="false" data-value="es" data-flag="🇪🇸"><span class="option-main"><span class="option-flag" aria-hidden="true">🇪🇸</span><span class="option-label">Español</span></span><span class="option-check" aria-hidden="true">✓</span></a></div></div>
