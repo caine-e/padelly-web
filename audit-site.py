@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parent
 ORIGIN = "https://getpadelly.com"
 ROBOTS_VALUE = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
 LEGAL_ROBOTS_VALUE = "noindex, follow"
+APP_STORE_URL = "https://apps.apple.com/app/id6776015574"
 DEDICATION = "♥ Built with love by AI and dedicated to Katja, who is way out of my league, on and off the court."
 
 GROUPS = [
@@ -250,6 +251,14 @@ def main() -> int:
             errors.append(f"{route}: contains href=\"#\"")
         if re.search(r'<a[^>]+class=["\'][^"\']*store-badge', source):
             errors.append(f"{route}: store placeholder is an active link")
+        for store_link in re.findall(r'href=["\'](https://apps\.apple\.com[^"\']*)', source):
+            if store_link != APP_STORE_URL:
+                errors.append(f"{route}: unverified App Store link {store_link}")
+        if route in HOME_SCREENSHOT_ROUTES:
+            locale_code = "de" if route.startswith("/de/") else "es" if route.startswith("/es/") else "en"
+            badge = f'<a class="sport-app-store" href="{APP_STORE_URL}"><img src="/assets/badges/app-store-{locale_code}.svg"'
+            if source.count(badge) != 2:
+                errors.append(f"{route}: expected two localized App Store badges")
         if re.search(r'store-badge-unavailable|Coming soon|Kommt bald|Próximamente|Google Play|coming-soon', source, re.IGNORECASE):
             errors.append(f"{route}: contains an unpublished store placeholder")
         if "mailto:" in source or "support@getpadelly.com" in source:
@@ -547,7 +556,7 @@ def main() -> int:
     print("- localized support forms, honeypots, Turnstile markers, and privacy links")
     print("- localized about pages, agent instructions, and machine-readable route assets")
     print("- exact dedication, legal links, legal-only email display, indexed sitemap, and legal noindex policy")
-    print("- no href=\"#\", active store placeholder, or CNAME")
+    print("- no href=\"#\", active store placeholder, or CNAME; localized App Store badges link to the verified listing")
     return 0
 
 

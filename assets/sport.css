@@ -217,3 +217,12 @@
 
 .sport-hero[data-in-view="false"] .sport-device-pair>.sport-phone,
 .sport-hero[data-in-view="false"] .sport-device-pair>.sport-watch { animation-play-state:paused; }
+
+/* Official App Store badge. Height matches .sport-button; gaps keep Apple's clear space (a quarter of the badge height). */
+.sport-app-store { display:inline-flex; flex:none; border-radius:9px; transition:transform .2s; }
+.sport-app-store img { display:block; width:auto; height:52px; }
+.sport-app-store:hover { transform:translateY(-2px); }
+.sport-home a.sport-app-store:focus-visible { outline-offset:4px; }
+@media (max-width:650px) { .sport-app-store { border-radius:8px; } .sport-app-store img { height:48px; } .sport-end .sport-button { min-height:48px; } }
+@media (max-width:360px) { .sport-hero .sport-actions { gap:12px; } }
+@media (prefers-reduced-motion:reduce) { .sport-app-store:hover { transform:none; } }
