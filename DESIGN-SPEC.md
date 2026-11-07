@@ -50,7 +50,7 @@ Desktop uses a split hero with headline left and devices right. Mobile places de
 
 English, German and Spanish routes; light, dark and system appearance; locale-matched real screenshots; metadata, structured data, support forms, legal text and dedication. The shared identity extends to supporting pages.
 
-No verified public App Store link was available in the site, so actions lead to actual app content. No fabricated download destination, testimonial, price, rating, sponsor or app capability is added.
+The homepage download action links to the App Store listing (id6776015574, verified in US and UK storefronts). No fabricated download destination, testimonial, price, rating, sponsor or app capability is added.
 
 ## Files
 

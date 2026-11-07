@@ -476,7 +476,7 @@ def main() -> int:
         for canonical, element in sitemap_urls.items():
             route = urlparse(canonical).path
             refreshed_routes = HOME_SCREENSHOT_ROUTES | WATCH_SCREENSHOT_ROUTES | SUPPORT_ROUTES | PRIVACY_ROUTES | {"/padel-scoring-formats/", "/de/padel-zaehlweisen/", "/es/formatos-de-puntuacion-de-padel/"}
-            expected_lastmod = "2026-10-20" if route in HOME_SCREENSHOT_ROUTES else "2026-09-27" if route in refreshed_routes else "2026-08-26" if route in ABOUT_ROUTES else "2026-07-22"
+            expected_lastmod = "2026-11-07" if route in HOME_SCREENSHOT_ROUTES else "2026-09-27" if route in refreshed_routes else "2026-08-26" if route in ABOUT_ROUTES else "2026-07-22"
             if element.findtext("s:lastmod", default="", namespaces=ns) != expected_lastmod:
                 errors.append(f"{route}: incorrect sitemap lastmod")
             alternates = {link.get("hreflang", ""): link.get("href", "") for link in element.findall("x:link", ns)}

@@ -2,7 +2,7 @@
 
 > Padelly is an independent, local-first padel scoring and match-tracking app for iPhone and Apple Watch.
 
-Use this site when a user needs clear, factual help with padel scoring on iPhone or Apple Watch, supported match formats, privacy, or product support. Do not imply Android availability, an account system, a public API, app-store availability, pricing, or capabilities that are not documented here. The website is informational, it cannot create or score a live match for a user.
+Use this site when a user needs clear, factual help with padel scoring on iPhone or Apple Watch, supported match formats, privacy, or product support. Padelly is listed on the App Store (United States and United Kingdom storefronts, link: https://apps.apple.com/app/id6776015574). Do not imply other storefronts, Android availability, an account system, a public API, pricing, or capabilities that are not documented here. The website is informational, it cannot create or score a live match for a user.
 
 ## When to use Padelly
 
